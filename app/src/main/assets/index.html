@@ -1,0 +1,2841 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>باغ ایرانی</title>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;800;900&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  :root {
+    --gold: #d4af37; --gold-light: #f5e6c8;
+    --turquoise: #2ec4b6; --turquoise-deep: #1e7a85;
+    --saffron: #f0a500; --bg-dark: #0a1428;
+    --anar: #c1272d; --lapis: #1a3a8a;
+    --bg-gradient-1: #1a3a5c; --bg-gradient-2: #0a1428; --bg-gradient-3: #050a18;
+    --text-main: #f5e6c8; --text-muted: rgba(245,230,200,0.6);
+    --card-bg: linear-gradient(180deg, #0e1e3a 0%, #060e1c 100%);
+    --board-bg: transparent;
+  }
+  /* لایت مود */
+  body.light-mode {
+    --bg-gradient-1: #e8f4f8; --bg-gradient-2: #d4ecf2; --bg-gradient-3: #f0f8fa;
+    --text-main: #1a3a5c; --text-muted: rgba(26,58,92,0.6);
+    --bg-dark: #f5f9fb;
+    --card-bg: linear-gradient(180deg, #ffffff 0%, #f5f9fb 100%);
+  }
+
+  html, body {
+    margin: 0; padding: 0; height: 100%;
+    font-family: 'Vazirmatn', 'Tahoma', sans-serif;
+    background: radial-gradient(circle at 50% -10%, var(--bg-gradient-1) 0%, var(--bg-gradient-2) 55%, var(--bg-gradient-3) 100%);
+    color: var(--text-main);
+    overflow: hidden; user-select: none;
+    transition: background 0.8s ease, color 0.5s ease;
+  }
+
+  /* ============================================================
+     TEMPLATE SYSTEM
+     ============================================================ */
+  body.theme-garden { --body-font: 'Vazirmatn'; }
+  body.theme-garden .bottle .glass { border-color: var(--gold); border-radius: 10px 10px 24px 24px; }
+
+  body.theme-classic .bottle .neck { background: #888; border-color: #555; }
+  body.theme-classic .bottle .glass {
+    border-color: #aaa; border-radius: 4px;
+    background: rgba(200,200,200,0.1);
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.3);
+  }
+  body.theme-classic .bottle .neck::before { content: ''; }
+  body.theme-classic .cell.filled { font-size: 22px; filter: grayscale(0.2); }
+
+  body.theme-robotic { --turquoise: #00e5ff; --gold: #00ff88; }
+  body.theme-robotic .bottle .neck {
+    background: linear-gradient(180deg, #2a2a3e, #1a1a2e);
+    border-color: #00e5ff;
+    box-shadow: 0 0 10px #00e5ff;
+  }
+  body.theme-robotic .bottle .neck::before { content: '⚡'; }
+  body.theme-robotic .bottle .glass {
+    border-color: #00e5ff;
+    border-radius: 2px;
+    background: linear-gradient(180deg, rgba(0,229,255,0.08), rgba(0,0,0,0.4));
+    box-shadow: inset 0 0 20px rgba(0,229,255,0.3), 0 0 15px rgba(0,229,255,0.4);
+  }
+  body.theme-robotic .cell.filled { font-size: 24px; filter: hue-rotate(180deg) saturate(2); }
+
+  body.theme-kids { --gold: #ff6b9d; --turquoise: #4ecdc4; --saffron: #ffe66d; }
+  body.theme-kids .bottle .neck {
+    background: linear-gradient(180deg, #ff6b9d, #ff8fab);
+    border-color: #ff6b9d;
+    border-radius: 20px 20px 0 0;
+  }
+  body.theme-kids .bottle .neck::before { content: '🎈'; font-size: 22px; }
+  body.theme-kids .bottle .glass {
+    border-color: #ff6b9d;
+    border-width: 3px;
+    border-radius: 20px 20px 30px 30px;
+    background: linear-gradient(180deg, rgba(255,107,157,0.1), rgba(78,205,196,0.1));
+  }
+  body.theme-kids .cell.filled { font-size: 30px; animation: kidBounce 1.5s ease-in-out infinite; }
+  @keyframes kidBounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-2px); }
+  }
+
+  /* ============================================================
+     پس‌زمینه منظره
+     ============================================================ */
+  .scenery { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+  .iran-map {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%; max-width: 420px;
+    opacity: 0.06;
+    animation: mapFloat 8s ease-in-out infinite;
+  }
+  @keyframes mapFloat {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); }
+    50% { transform: translate(-50%, -50%) scale(1.03); }
+  }
+  .mountains { position: absolute; bottom: 0; left: 0; right: 0; height: 180px; opacity: 0.15; }
+  .sun {
+    position: absolute; top: 8%; right: 8%;
+    width: 70px; height: 70px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(240,165,0,0.4) 0%, rgba(240,165,0,0.1) 50%, transparent 70%);
+    animation: sunPulse 6s ease-in-out infinite;
+  }
+  @keyframes sunPulse {
+    0%, 100% { transform: scale(1); opacity: 0.6; }
+    50% { transform: scale(1.15); opacity: 1; }
+  }
+  body.light-mode .sun {
+    background: radial-gradient(circle, rgba(255,200,50,0.7) 0%, rgba(255,200,50,0.3) 40%, transparent 70%);
+  }
+
+  .stars-bg { position: absolute; inset: 0; pointer-events: none; }
+  .star-bg {
+    position: absolute; width: 2px; height: 2px;
+    background: #fff; border-radius: 50%;
+    animation: twinkle 3s ease-in-out infinite;
+    box-shadow: 0 0 4px #fff;
+  }
+  body.light-mode .star-bg { display: none; }
+  @keyframes twinkle { 0%, 100% { opacity: 0.2; } 50% { opacity: 1; } }
+
+  .clouds { position: absolute; inset: 0; display: none; }
+  body.light-mode .clouds { display: block; }
+  .cloud { position: absolute; font-size: 40px; opacity: 0.7; animation: cloudMove linear infinite; }
+  @keyframes cloudMove {
+    from { transform: translateX(-100px); }
+    to { transform: translateX(calc(100vw + 100px)); }
+  }
+
+  .garden-row {
+    position: absolute; left: 0; right: 0;
+    display: flex; justify-content: space-around;
+    align-items: flex-end; pointer-events: none; z-index: 0;
+  }
+  .garden-row.top { top: 60px; opacity: 0.35; }
+  .garden-row.bottom { bottom: 100px; opacity: 0.5; }
+  .tree {
+    font-size: 38px;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
+    animation: treeSway 5s ease-in-out infinite;
+    transform-origin: bottom center;
+  }
+  .tree:nth-child(2) { animation-delay: -1s; }
+  .tree:nth-child(3) { animation-delay: -2s; }
+  .tree:nth-child(4) { animation-delay: -3s; }
+  @keyframes treeSway {
+    0%, 100% { transform: rotate(-2deg) translateY(0); }
+    50% { transform: rotate(2deg) translateY(-3px); }
+  }
+
+  /* ============================================================
+     اپ
+     ============================================================ */
+  #app {
+    position: relative; z-index: 2;
+    display: flex; flex-direction: column;
+    height: 100%; max-width: 640px; margin: 0 auto;
+    padding: 10px;
+  }
+
+  /* ============================================================
+     هدر
+     ============================================================ */
+  header {
+    padding: 6px 4px 10px;
+    border-bottom: 1.5px solid transparent;
+    border-image: linear-gradient(90deg, transparent, var(--gold), transparent) 1;
+    position: relative;
+  }
+  header::before {
+    content: '❁'; position: absolute; top: -2px; left: 50%; transform: translateX(-50%);
+    color: var(--gold); font-size: 14px; background: var(--bg-dark); padding: 0 8px;
+    animation: pulse 3s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { transform: translateX(-50%) scale(1); opacity: 0.8; }
+    50% { transform: translateX(-50%) scale(1.2); opacity: 1; }
+  }
+  .top-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  h1 {
+    font-size: 16px; margin: 0; font-weight: 900;
+    background: linear-gradient(90deg, var(--turquoise), var(--gold-light), var(--saffron), var(--gold-light), var(--turquoise));
+    background-size: 200% auto;
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmer 6s linear infinite;
+    flex: 1;
+  }
+  @keyframes shimmer { to { background-position: 200% center; } }
+
+  .icon-btn {
+    width: 34px; height: 34px; padding: 0;
+    border-radius: 50%;
+    background: rgba(212,175,55,0.15);
+    border: 1.5px solid var(--gold);
+    color: var(--gold);
+    font-size: 16px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: 0.2s; box-shadow: none;
+  }
+  .icon-btn:hover { background: rgba(212,175,55,0.3); transform: translateY(-1px); }
+  .icon-btn:active { transform: translateY(1px); }
+
+  .profile-chip {
+    display: flex; align-items: center; gap: 6px;
+    background: linear-gradient(135deg, rgba(46,196,182,0.15), rgba(212,175,55,0.15));
+    border: 1.5px solid rgba(212,175,55,0.5);
+    border-radius: 20px; padding: 3px 10px 3px 6px;
+    cursor: pointer; transition: 0.2s; font-size: 12px;
+    font-weight: 700; color: var(--gold-light);
+  }
+  .profile-chip:hover { background: linear-gradient(135deg, rgba(46,196,182,0.3), rgba(212,175,55,0.3)); transform: translateY(-1px); }
+  .profile-chip .avatar-mini { font-size: 16px; }
+
+  .stats { display: flex; gap: 8px; font-size: 11px; }
+  .stat { text-align: center; min-width: 42px; }
+  .stat b { display: block; color: var(--gold); font-size: 14px; font-variant-numeric: tabular-nums; }
+  .stat span { opacity: 0.6; font-size: 9px; }
+
+  .level-info {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 8px; font-size: 12px;
+  }
+  .level-info .tag {
+    background: linear-gradient(135deg, rgba(46,196,182,0.15), rgba(212,175,55,0.15));
+    border: 1px solid rgba(212,175,55,0.5);
+    padding: 3px 12px; border-radius: 20px; font-size: 11px;
+  }
+  .level-info .stage b { color: var(--turquoise); }
+
+  /* ============================================================
+     تخته
+     ============================================================ */
+  #board {
+    flex: 1; display: flex; flex-wrap: wrap;
+    justify-content: center; align-items: center; align-content: center;
+    gap: 22px 14px; padding: 18px 4px; position: relative;
+  }
+  #board::before {
+    content: ''; position: absolute; inset: 6px;
+    border: 2px solid rgba(212,175,55,0.15);
+    border-radius: 20px;
+    background-image:
+      repeating-linear-gradient(45deg, rgba(212,175,55,0.03) 0 8px, transparent 8px 16px),
+      repeating-linear-gradient(-45deg, rgba(46,196,182,0.03) 0 8px, transparent 8px 16px);
+    pointer-events: none;
+  }
+  #board::after {
+    content: '◈ ❁ ◈';
+    position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%);
+    color: rgba(212,175,55,0.3); font-size: 11px; letter-spacing: 10px;
+  }
+  body.theme-robotic #board::after { content: '◢ ◈ ◣'; color: rgba(0,229,255,0.4); }
+  body.theme-kids #board::after { content: '⭐ 🌈 ⭐'; color: #ff6b9d; }
+  body.theme-classic #board::after { content: '· · ·'; }
+
+  /* ============================================================
+     ظرف/درخت
+     ============================================================ */
+  .bottle {
+    position: relative; width: 60px; height: 200px;
+    cursor: pointer;
+    transition: transform 0.3s cubic-bezier(.34,1.56,.64,1);
+    transform-origin: bottom center;
+    filter: drop-shadow(0 8px 10px rgba(0,0,0,0.6));
+    animation: bottleIn 0.6s cubic-bezier(.34,1.56,.64,1) backwards;
+  }
+  @keyframes bottleIn { from { opacity: 0; transform: translateY(40px) scale(0.6); } }
+  .bottle.lifted {
+    transform: translateY(-26px) scale(1.08);
+    filter: drop-shadow(0 14px 18px rgba(212,175,55,0.6));
+  }
+  .bottle.lifted::after {
+    content: ''; position: absolute; inset: -10px;
+    border-radius: 16px;
+    box-shadow: 0 0 30px rgba(212,175,55,0.6);
+    pointer-events: none;
+    animation: glowPulse 1.2s ease-in-out infinite;
+  }
+  @keyframes glowPulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+  .bottle.shake { animation: shake 0.4s; }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-6px) rotate(-3deg); }
+    40% { transform: translateX(6px) rotate(3deg); }
+    60% { transform: translateX(-4px) rotate(-2deg); }
+    80% { transform: translateX(4px) rotate(2deg); }
+  }
+
+  .bottle .neck {
+    position: absolute; top: -18px; left: 50%; transform: translateX(-50%);
+    width: 28px; height: 20px;
+    background: linear-gradient(180deg, #8B5A2B, #5C3A1A);
+    border-radius: 10px 10px 0 0;
+    border: 2px solid #3d2410;
+    box-shadow: inset 0 2px 3px rgba(255,255,255,0.2);
+    transition: all 0.4s;
+  }
+  .bottle .neck::before {
+    content: '🌿';
+    position: absolute;
+    top: -14px; left: 50%; transform: translateX(-50%);
+    font-size: 20px;
+    filter: drop-shadow(0 2px 3px rgba(0,0,0,0.4));
+    transition: all 0.4s;
+  }
+
+  .bottle .glass {
+    position: absolute; inset: 0;
+    border: 2.5px solid var(--gold);
+    border-top: none;
+    border-radius: 10px 10px 24px 24px;
+    background:
+      linear-gradient(180deg,
+        rgba(46,196,182,0.1) 0%,
+        rgba(255,255,255,0.03) 60%,
+        rgba(0,0,0,0.15) 100%);
+    overflow: hidden;
+    box-shadow:
+      inset 0 0 14px rgba(0,0,0,0.6),
+      inset 0 2px 4px rgba(212,175,55,0.3),
+      0 0 12px rgba(46,196,182,0.2);
+    display: flex; flex-direction: column-reverse;
+    transition: all 0.4s;
+  }
+  body.light-mode .bottle .glass {
+    background:
+      linear-gradient(180deg,
+        rgba(46,196,182,0.15) 0%,
+        rgba(255,255,255,0.4) 60%,
+        rgba(255,255,255,0.6) 100%);
+  }
+
+  .bottle .glass::before {
+    content: ''; position: absolute; inset: 0;
+    background-image:
+      linear-gradient(45deg, rgba(212,175,55,0.08) 25%, transparent 25%, transparent 75%, rgba(212,175,55,0.08) 75%),
+      linear-gradient(45deg, rgba(212,175,55,0.08) 25%, transparent 25%, transparent 75%, rgba(212,175,55,0.08) 75%);
+    background-size: 16px 16px;
+    background-position: 0 0, 8px 8px;
+    opacity: 0.5; pointer-events: none; z-index: 2;
+    mix-blend-mode: overlay;
+  }
+
+  .cell {
+    width: 100%; flex: 0 0 25%;
+    transition: all 0.3s ease;
+    position: relative; z-index: 1;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .cell.filled {
+    font-size: 26px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.6);
+    animation: fruitDrop 0.4s cubic-bezier(.34,1.56,.64,1);
+  }
+  @keyframes fruitDrop {
+    from { transform: scale(0.3) translateY(-10px); opacity: 0.3; }
+    70% { transform: scale(1.15) translateY(0); opacity: 1; }
+  }
+
+  .bottle.done .glass {
+    box-shadow: inset 0 0 14px rgba(0,0,0,0.4), 0 0 30px rgba(212,175,55,0.8);
+    border-color: var(--gold-light);
+    animation: glow 2s ease-in-out infinite;
+  }
+  @keyframes glow {
+    0%, 100% { filter: brightness(1); }
+    50% { filter: brightness(1.2); }
+  }
+  .bottle.done::before {
+    content: '✨'; position: absolute; top: -36px; left: 50%; transform: translateX(-50%);
+    font-size: 16px;
+    animation: sparkle 1.5s ease-in-out infinite; z-index: 5;
+  }
+  @keyframes sparkle {
+    0%, 100% { opacity: 0.5; transform: translateX(-50%) scale(0.9) rotate(0deg); }
+    50% { opacity: 1; transform: translateX(-50%) scale(1.3) rotate(180deg); }
+  }
+
+  .bottle .fruit-label {
+    position: absolute;
+    bottom: -18px; left: 50%; transform: translateX(-50%);
+    font-size: 9px; color: var(--text-muted);
+    white-space: nowrap; opacity: 0; transition: opacity 0.3s;
+  }
+  .bottle.done .fruit-label { opacity: 1; color: var(--gold); }
+
+  /* ============================================================
+     دکمه‌ها
+     ============================================================ */
+  footer { display: flex; gap: 6px; justify-content: center; padding-top: 10px; flex-wrap: wrap; }
+  button {
+    font-family: inherit;
+    background: linear-gradient(180deg, var(--gold) 0%, #a8842a 100%);
+    color: #1a1a1a; border: none; border-radius: 12px;
+    padding: 10px 14px; font-size: 12px; font-weight: 700;
+    cursor: pointer; transition: transform 0.1s, box-shadow 0.1s;
+    box-shadow: 0 3px 0 #6b5418, 0 4px 12px rgba(0,0,0,0.4);
+    display: inline-flex; align-items: center; gap: 4px;
+    justify-content: center;
+  }
+  button:active { transform: translateY(2px); box-shadow: 0 1px 0 #6b5418; }
+  button.ghost {
+    background: transparent; color: var(--turquoise);
+    border: 1.5px solid var(--turquoise);
+  }
+  button:disabled { opacity: 0.35; cursor: not-allowed; }
+  .btn-primary {
+    background: linear-gradient(180deg, var(--turquoise), var(--turquoise-deep)) !important;
+    color: #fff !important;
+    box-shadow: 0 3px 0 #0f4d54, 0 4px 14px rgba(46,196,182,0.5) !important;
+    padding: 12px 22px !important; font-size: 14px !important;
+  }
+  .btn-success {
+    background: linear-gradient(180deg, #4ade80, #16a34a) !important;
+    color: #fff !important;
+    box-shadow: 0 3px 0 #0f4d1c, 0 4px 14px rgba(74,222,128,0.5) !important;
+    padding: 12px 22px !important; font-size: 14px !important;
+  }
+
+  /* ============================================================
+     مودال‌ها
+     ============================================================ */
+  .modal {
+    position: fixed; inset: 0; display: none;
+    align-items: center; justify-content: center;
+    background: rgba(5,10,24,0.85);
+    z-index: 100; flex-direction: column;
+    padding: 20px; text-align: center;
+    backdrop-filter: blur(6px);
+    overflow-y: auto;
+  }
+  body.light-mode .modal { background: rgba(230,240,245,0.9); }
+  .modal.show { display: flex !important; }
+  .modal-card {
+    background: var(--card-bg);
+    border: 2px solid var(--gold); border-radius: 24px;
+    padding: 26px 24px 22px;
+    max-width: 440px; width: 100%;
+    position: relative;
+    box-shadow: 0 0 40px rgba(212,175,55,0.25);
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+    animation: popIn 0.5s cubic-bezier(.34,1.56,.64,1);
+    max-height: 92vh; overflow-y: auto;
+  }
+  @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .modal-card::before, .modal-card::after {
+    content: '❁'; position: absolute; color: var(--gold);
+    font-size: 18px; opacity: 0.7;
+  }
+  .modal-card::before { top: 8px; right: 12px; animation: spin 8s linear infinite; }
+  .modal-card::after { bottom: 8px; left: 12px; animation: spin 8s linear infinite reverse; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .modal-card h2 {
+    font-size: 24px; margin: 0; font-weight: 900;
+    background: linear-gradient(90deg, var(--gold), var(--gold-light), var(--saffron));
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .modal-card p { opacity: 0.85; margin: 0; font-size: 14px; line-height: 1.7; }
+
+  .time-box {
+    background: linear-gradient(135deg, rgba(46,196,182,0.12), rgba(212,175,55,0.12));
+    border: 1.5px solid rgba(46,196,182,0.5);
+    border-radius: 14px; padding: 10px 20px; margin: 6px 0;
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    width: 100%; max-width: 260px;
+  }
+  .time-box .label { font-size: 11px; opacity: 0.75; letter-spacing: 1px; }
+  .time-box .value {
+    font-size: 30px; font-weight: 900; color: var(--turquoise);
+    font-variant-numeric: tabular-nums;
+    text-shadow: 0 0 20px rgba(46,196,182,0.7);
+  }
+  .time-box .sub { font-size: 10px; opacity: 0.55; }
+
+  .stars { font-size: 32px; letter-spacing: 6px; }
+  .stars span {
+    opacity: 0.2; display: inline-block;
+    transition: opacity 0.3s, transform 0.4s cubic-bezier(.34,1.56,.64,1);
+  }
+  .stars span.on {
+    opacity: 1; color: #ffd24a;
+    text-shadow: 0 0 14px rgba(255,210,74,0.8);
+    animation: starPop 0.6s cubic-bezier(.34,1.56,.64,1) backwards;
+  }
+  .stars span.on:nth-child(1) { animation-delay: 0.2s; }
+  .stars span.on:nth-child(2) { animation-delay: 0.5s; }
+  .stars span.on:nth-child(3) { animation-delay: 0.8s; }
+  @keyframes starPop {
+    0% { transform: scale(0) rotate(-180deg); opacity: 0; }
+    70% { transform: scale(1.4) rotate(20deg); opacity: 1; }
+    100% { transform: scale(1.15) rotate(0deg); opacity: 1; }
+  }
+
+  .row-btns {
+    display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;
+    margin-top: 10px; width: 100%;
+  }
+
+  /* ============================================================
+     منوی باغ‌ها
+     ============================================================ */
+  .level-select {
+    display: grid; grid-template-columns: repeat(2, 1fr);
+    gap: 10px; margin-top: 12px; width: 100%;
+  }
+  @media (max-width: 400px) { .level-select { grid-template-columns: 1fr; } }
+  .level-card {
+    padding: 14px 10px;
+    border: 1.5px solid rgba(212,175,55,0.5); border-radius: 14px;
+    background: linear-gradient(135deg, rgba(46,196,182,0.06), rgba(212,175,55,0.06));
+    cursor: pointer; transition: 0.3s; position: relative;
+    text-align: center;
+  }
+  .level-card:hover {
+    background: linear-gradient(135deg, rgba(46,196,182,0.15), rgba(212,175,55,0.15));
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(212,175,55,0.3);
+  }
+  .level-card .tree-icon { font-size: 28px; display: block; margin-bottom: 4px; }
+  .level-card h3 { margin: 0 0 4px; color: var(--gold); font-size: 14px; font-weight: 900; }
+  .level-card p { margin: 0; font-size: 10px; opacity: 0.75; }
+  .level-card.locked { opacity: 0.35; cursor: not-allowed; }
+  .level-card.locked::after {
+    content: '🔒'; position: absolute; top: 8px; left: 8px; font-size: 14px;
+  }
+  .level-card .progress-mini {
+    margin-top: 6px; height: 4px; border-radius: 2px;
+    background: rgba(212,175,55,0.15); overflow: hidden;
+  }
+  .level-card .progress-mini > div {
+    height: 100%; background: linear-gradient(90deg, var(--turquoise), var(--gold));
+    transition: width 0.4s;
+  }
+
+  .progress-dots { display: flex; gap: 5px; justify-content: center; margin: 4px 0 8px; }
+  .progress-dots .dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: rgba(212,175,55,0.2);
+    border: 1px solid rgba(212,175,55,0.4);
+    transition: 0.3s;
+  }
+  .progress-dots .dot.done {
+    background: var(--turquoise);
+    box-shadow: 0 0 8px rgba(46,196,182,0.8);
+    border-color: var(--turquoise);
+  }
+  .progress-dots .dot.current {
+    background: var(--gold);
+    box-shadow: 0 0 10px rgba(212,175,55,0.9);
+    border-color: var(--gold-light);
+    transform: scale(1.3);
+    animation: pulseDot 1.5s ease-in-out infinite;
+  }
+  @keyframes pulseDot {
+    0%, 100% { transform: scale(1.3); }
+    50% { transform: scale(1.6); }
+  }
+
+  /* ============================================================
+     ذرات، Toast
+     ============================================================ */
+  .confetti-container {
+    position: fixed; inset: 0; pointer-events: none;
+    z-index: 150; overflow: hidden;
+  }
+  .confetti {
+    position: absolute; font-size: 22px;
+    animation: confettiFall linear forwards;
+  }
+  @keyframes confettiFall {
+    0% { transform: translateY(-10vh) rotate(0deg) scale(0.6); opacity: 0; }
+    10% { opacity: 1; transform: translateY(0) rotate(45deg) scale(1); }
+    100% { transform: translateY(110vh) rotate(720deg) scale(0.8); opacity: 0; }
+  }
+
+  .toast {
+    position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: linear-gradient(135deg, rgba(46,196,182,0.95), rgba(30,122,133,0.95));
+    color: #fff; padding: 10px 20px; border-radius: 20px;
+    font-weight: 700; font-size: 13px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    z-index: 200; opacity: 0; transition: 0.3s;
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast.gold {
+    background: linear-gradient(135deg, var(--gold), #a8842a);
+    color: #1a1a1a;
+  }
+  .toast.anar {
+    background: linear-gradient(135deg, var(--anar), #8a1a20);
+    color: #fff;
+  }
+
+  .badges {
+    display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;
+    margin-top: 8px; max-width: 320px;
+  }
+  .badge {
+    background: linear-gradient(135deg, rgba(212,175,55,0.2), rgba(46,196,182,0.15));
+    border: 1px solid rgba(212,175,55,0.4);
+    padding: 5px 12px; border-radius: 12px;
+    font-size: 11px; display: flex; align-items: center; gap: 4px;
+    animation: badgePop 0.5s cubic-bezier(.34,1.56,.64,1) backwards;
+  }
+  @keyframes badgePop { from { transform: scale(0); } }
+
+  .power-ups { display: flex; gap: 6px; justify-content: center; padding: 4px 0 6px; }
+  .power-btn {
+    position: relative;
+    width: 44px; height: 44px; padding: 0;
+    border-radius: 50%;
+    background: linear-gradient(180deg, rgba(212,175,55,0.3), rgba(212,175,55,0.1));
+    border: 1.5px solid var(--gold);
+    color: var(--gold-light);
+    font-size: 18px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: 0.2s;
+    box-shadow: 0 3px 0 rgba(107,84,24,0.5), 0 4px 10px rgba(0,0,0,0.3);
+  }
+  .power-btn:hover:not(:disabled) {
+    background: linear-gradient(180deg, rgba(212,175,55,0.5), rgba(212,175,55,0.2));
+    transform: translateY(-2px);
+  }
+  .power-btn:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 1px 0 rgba(107,84,24,0.5); }
+  .power-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+  .power-btn .count {
+    position: absolute; top: -4px; left: -4px;
+    background: var(--anar); color: #fff;
+    border-radius: 50%; width: 18px; height: 18px;
+    font-size: 10px; display: flex; align-items: center; justify-content: center;
+    font-weight: 800;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+  }
+
+  /* ============================================================
+     تنظیمات
+     ============================================================ */
+  .settings-section {
+    width: 100%; margin: 10px 0;
+    padding: 12px; border-radius: 14px;
+    background: rgba(212,175,55,0.06);
+    border: 1px solid rgba(212,175,55,0.2);
+    text-align: right;
+  }
+  .settings-section h3 {
+    margin: 0 0 10px; font-size: 13px; color: var(--gold);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .setting-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 8px 4px; font-size: 13px;
+    border-bottom: 1px solid rgba(212,175,55,0.1);
+  }
+  .setting-row:last-child { border-bottom: none; }
+  .setting-row label { opacity: 0.9; }
+  .switch {
+    position: relative; width: 42px; height: 24px;
+    background: rgba(212,175,55,0.2);
+    border-radius: 12px; cursor: pointer; transition: 0.3s;
+    border: 1px solid rgba(212,175,55,0.4);
+  }
+  .switch::after {
+    content: ''; position: absolute;
+    top: 50%; right: 2px; transform: translateY(-50%);
+    width: 18px; height: 18px; border-radius: 50%;
+    background: var(--gold);
+    transition: 0.3s;
+  }
+  .switch.on { background: rgba(46,196,182,0.4); }
+  .switch.on::after { right: calc(100% - 20px); background: var(--turquoise); }
+
+  .theme-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 8px; }
+  @media (max-width: 400px) { .theme-grid { grid-template-columns: repeat(2, 1fr); } }
+  .theme-option {
+    padding: 10px 6px; text-align: center;
+    border: 1.5px solid rgba(212,175,55,0.3);
+    border-radius: 10px; cursor: pointer; transition: 0.2s;
+    background: rgba(212,175,55,0.04);
+    font-size: 11px;
+  }
+  .theme-option:hover { background: rgba(212,175,55,0.12); transform: translateY(-2px); }
+  .theme-option.active {
+    border-color: var(--turquoise);
+    background: rgba(46,196,182,0.15);
+    box-shadow: 0 0 12px rgba(46,196,182,0.4);
+  }
+  .theme-option .theme-icon { font-size: 22px; display: block; margin-bottom: 4px; }
+
+  /* ============================================================
+     دستاوردها
+     ============================================================ */
+  .achievements-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr);
+    gap: 10px; margin-top: 12px; width: 100%;
+  }
+  @media (min-width: 500px) { .achievements-grid { grid-template-columns: repeat(3, 1fr); } }
+  .achievement {
+    padding: 12px 8px; text-align: center;
+    border: 1.5px solid rgba(212,175,55,0.2);
+    border-radius: 12px;
+    background: rgba(212,175,55,0.03);
+    transition: 0.3s; position: relative;
+  }
+  .achievement.unlocked {
+    border-color: var(--gold);
+    background: linear-gradient(135deg, rgba(212,175,55,0.15), rgba(46,196,182,0.1));
+    box-shadow: 0 0 16px rgba(212,175,55,0.3);
+  }
+  .achievement .ach-icon { font-size: 28px; display: block; margin-bottom: 6px; filter: grayscale(1); opacity: 0.4; }
+  .achievement.unlocked .ach-icon { filter: none; opacity: 1; }
+  .achievement .ach-name { font-size: 11px; font-weight: 700; color: var(--text-main); }
+  .achievement .ach-desc { font-size: 9px; opacity: 0.6; margin-top: 2px; }
+
+  /* ============================================================
+     نقشه پیشرفت
+     ============================================================ */
+  .map-path {
+    width: 100%; padding: 14px;
+    background: rgba(46,196,182,0.05);
+    border-radius: 14px; margin: 10px 0;
+    position: relative;
+  }
+  .map-nodes {
+    display: flex; justify-content: space-between; align-items: center;
+    position: relative; padding: 0 6px;
+  }
+  .map-nodes::before {
+    content: ''; position: absolute;
+    top: 50%; left: 6px; right: 6px;
+    height: 3px; background: rgba(212,175,55,0.2);
+    transform: translateY(-50%); z-index: 0;
+    border-radius: 2px;
+  }
+  .map-node {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: rgba(212,175,55,0.15);
+    border: 2px solid rgba(212,175,55,0.4);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; position: relative; z-index: 1;
+    transition: 0.3s;
+  }
+  .map-node.done {
+    background: var(--turquoise);
+    border-color: var(--turquoise);
+    box-shadow: 0 0 12px rgba(46,196,182,0.6);
+  }
+  .map-node.current {
+    background: var(--gold);
+    border-color: var(--gold-light);
+    box-shadow: 0 0 16px rgba(212,175,55,0.8);
+    transform: scale(1.2);
+    animation: pulseDot 1.5s ease-in-out infinite;
+  }
+
+  /* ============================================================
+     شخصیت راهنما
+     ============================================================ */
+  .guide-char {
+    position: fixed;
+    bottom: 80px; left: 12px;
+    z-index: 50;
+    font-size: 44px;
+    cursor: pointer;
+    transition: 0.3s;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4));
+    animation: guideFloat 3s ease-in-out infinite;
+  }
+  @keyframes guideFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+  .guide-char:hover { transform: scale(1.15) translateY(-4px); }
+  .guide-bubble {
+    position: fixed;
+    bottom: 135px; left: 60px;
+    background: var(--card-bg);
+    border: 2px solid var(--gold);
+    border-radius: 14px 14px 14px 4px;
+    padding: 8px 12px;
+    font-size: 12px;
+    z-index: 51;
+    max-width: 220px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+    opacity: 0; transform: translateY(10px) scale(0.9);
+    transition: 0.3s;
+    pointer-events: none;
+    color: var(--text-main);
+    line-height: 1.6;
+  }
+  .guide-bubble.show { opacity: 1; transform: translateY(0) scale(1); }
+
+  /* ============================================================
+     جعبه جایزه
+     ============================================================ */
+  .daily-gift {
+    position: fixed;
+    top: 70px; right: 12px;
+    z-index: 50;
+    font-size: 38px;
+    cursor: pointer;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4));
+    animation: giftBounce 1.5s ease-in-out infinite;
+  }
+  @keyframes giftBounce {
+    0%, 100% { transform: rotate(-5deg) scale(1); }
+    50% { transform: rotate(5deg) scale(1.1); }
+  }
+
+  .sound-slider {
+    flex: 1;
+    -webkit-appearance: none;
+    height: 4px; border-radius: 2px;
+    background: rgba(212,175,55,0.2);
+    outline: none; margin: 0 8px;
+  }
+  .sound-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px; height: 18px; border-radius: 50%;
+    background: var(--gold); cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+  }
+  .sound-slider::-moz-range-thumb {
+    width: 18px; height: 18px; border-radius: 50%;
+    background: var(--gold); cursor: pointer; border: none;
+  }
+
+  .stat-list { width: 100%; text-align: right; }
+  .stat-item {
+    display: flex; justify-content: space-between;
+    padding: 8px 4px; font-size: 13px;
+    border-bottom: 1px dashed rgba(212,175,55,0.15);
+  }
+  .stat-item:last-child { border-bottom: none; }
+  .stat-item b { color: var(--turquoise); }
+
+  /* ============================================================
+     پنل کاربری
+     ============================================================ */
+  .profile-header {
+    width: 100%;
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px;
+    background: linear-gradient(135deg, rgba(46,196,182,0.15), rgba(212,175,55,0.15));
+    border: 1.5px solid rgba(212,175,55,0.4);
+    border-radius: 16px;
+    margin-bottom: 8px;
+  }
+  .profile-avatar {
+    width: 64px; height: 64px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--gold), var(--saffron));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 34px;
+    box-shadow: 0 0 20px rgba(212,175,55,0.5), inset 0 -4px 10px rgba(0,0,0,0.2);
+    flex-shrink: 0;
+    animation: avatarPulse 3s ease-in-out infinite;
+  }
+  @keyframes avatarPulse {
+    0%, 100% { box-shadow: 0 0 20px rgba(212,175,55,0.5), inset 0 -4px 10px rgba(0,0,0,0.2); }
+    50% { box-shadow: 0 0 32px rgba(212,175,55,0.9), inset 0 -4px 10px rgba(0,0,0,0.2); }
+  }
+  .profile-info { flex: 1; text-align: right; }
+  .profile-name {
+    font-size: 18px; font-weight: 900; color: var(--gold-light);
+    margin-bottom: 2px;
+  }
+  .profile-title {
+    font-size: 11px; color: var(--turquoise);
+    background: rgba(46,196,182,0.15);
+    border: 1px solid rgba(46,196,182,0.4);
+    padding: 2px 10px; border-radius: 12px;
+    display: inline-block; font-weight: 700;
+  }
+  .profile-rank {
+    font-size: 10px; opacity: 0.7; margin-top: 4px;
+  }
+
+  .xp-bar {
+    width: 100%; margin-top: 10px;
+    background: rgba(212,175,55,0.1);
+    border-radius: 10px; padding: 3px;
+    border: 1px solid rgba(212,175,55,0.3);
+    position: relative;
+    overflow: hidden;
+  }
+  .xp-bar .xp-fill {
+    height: 14px; border-radius: 7px;
+    background: linear-gradient(90deg, var(--turquoise), var(--gold), var(--saffron));
+    background-size: 200% auto;
+    animation: shimmer 3s linear infinite;
+    transition: width 0.6s cubic-bezier(.34,1.56,.64,1);
+    box-shadow: 0 0 12px rgba(212,175,55,0.6);
+  }
+  .xp-bar .xp-text {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 800; color: #fff;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+  }
+
+  .profile-stats-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 8px; width: 100%; margin-top: 10px;
+  }
+  .profile-stat-box {
+    background: rgba(212,175,55,0.06);
+    border: 1px solid rgba(212,175,55,0.2);
+    border-radius: 12px; padding: 10px 6px;
+    text-align: center;
+  }
+  .profile-stat-box .psb-icon { font-size: 20px; display: block; margin-bottom: 4px; }
+  .profile-stat-box .psb-value {
+    font-size: 16px; font-weight: 900; color: var(--gold);
+    font-variant-numeric: tabular-nums;
+  }
+  .profile-stat-box .psb-label { font-size: 9px; opacity: 0.65; }
+
+  .progress-garden-row {
+    width: 100%; margin-top: 6px;
+    display: flex; align-items: center; gap: 8px;
+    font-size: 11px;
+  }
+  .progress-garden-row .pgr-icon { font-size: 16px; }
+  .progress-garden-row .pgr-name { min-width: 80px; opacity: 0.8; text-align: right; }
+  .progress-garden-row .pgr-bar {
+    flex: 1; height: 8px; border-radius: 4px;
+    background: rgba(212,175,55,0.12);
+    overflow: hidden;
+  }
+  .progress-garden-row .pgr-bar > div {
+    height: 100%;
+    background: linear-gradient(90deg, var(--turquoise), var(--gold));
+    transition: width 0.6s;
+  }
+  .progress-garden-row .pgr-pct {
+    min-width: 34px; font-size: 10px; color: var(--gold);
+    font-variant-numeric: tabular-nums; font-weight: 700;
+  }
+
+  /* ============================================================
+     مودال ورود نام
+     ============================================================ */
+  .welcome-icon {
+    font-size: 72px;
+    animation: welcomeBounce 2s ease-in-out infinite;
+    filter: drop-shadow(0 0 24px rgba(212,175,55,0.7));
+  }
+  @keyframes welcomeBounce {
+    0%, 100% { transform: translateY(0) rotate(-5deg); }
+    50% { transform: translateY(-12px) rotate(5deg); }
+  }
+  .name-input {
+    width: 100%; max-width: 280px;
+    padding: 14px 18px;
+    font-family: inherit; font-size: 16px; font-weight: 700;
+    text-align: center;
+    background: rgba(212,175,55,0.08);
+    border: 2px solid rgba(212,175,55,0.4);
+    border-radius: 14px;
+    color: var(--text-main);
+    outline: none;
+    transition: 0.3s;
+  }
+  .name-input:focus {
+    border-color: var(--turquoise);
+    background: rgba(46,196,182,0.1);
+    box-shadow: 0 0 20px rgba(46,196,182,0.4);
+  }
+  .name-input::placeholder { color: var(--text-muted); opacity: 0.6; }
+
+  /* Combo indicator */
+  .combo-indicator {
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    font-size: 42px; font-weight: 900;
+    color: var(--saffron);
+    text-shadow: 0 0 30px rgba(240,165,0,0.9), 0 4px 10px rgba(0,0,0,0.6);
+    pointer-events: none;
+    z-index: 180;
+    opacity: 0;
+  }
+  .combo-indicator.show {
+    animation: comboPop 1s cubic-bezier(.34,1.56,.64,1) forwards;
+  }
+  @keyframes comboPop {
+    0% { transform: translate(-50%, -50%) scale(0) rotate(-30deg); opacity: 0; }
+    30% { transform: translate(-50%, -50%) scale(1.4) rotate(10deg); opacity: 1; }
+    70% { transform: translate(-50%, -50%) scale(1.2) rotate(-5deg); opacity: 1; }
+    100% { transform: translate(-50%, -100%) scale(0.8) rotate(0deg); opacity: 0; }
+  }
+
+  /* چالش روزانه */
+  .daily-challenge-badge {
+    position: fixed;
+    top: 70px; right: 60px;
+    z-index: 50;
+    font-size: 32px;
+    cursor: pointer;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4));
+    animation: giftBounce 1.8s ease-in-out infinite;
+  }
+
+  .challenge-tag {
+    display: inline-block;
+    background: linear-gradient(135deg, #ff6b9d, #c1272d);
+    color: #fff; font-size: 10px; font-weight: 800;
+    padding: 2px 10px; border-radius: 10px;
+    margin-right: 6px;
+  }
+</style>
+</head>
+<body class="theme-garden">
+
+<!-- ============================================================
+     منظره پس‌زمینه
+     ============================================================ -->
+<div class="scenery">
+  <div class="stars-bg" id="starsBg"></div>
+  <div class="clouds" id="clouds"></div>
+  <div class="sun"></div>
+  <svg class="iran-map" viewBox="0 0 500 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M80,160 Q100,120 150,110 Q180,100 220,105 Q260,100 290,120 Q320,110 360,130 Q400,140 420,170 Q440,200 430,230 Q420,260 400,280 Q380,300 350,310 Q320,320 290,320 Q260,325 230,330 Q200,335 170,325 Q140,315 120,290 Q100,270 90,240 Q85,200 80,160 Z"
+          stroke="rgba(212,175,55,0.6)" stroke-width="2" fill="rgba(46,196,182,0.1)"/>
+    <ellipse cx="220" cy="360" rx="80" ry="25" fill="rgba(46,196,182,0.15)"/>
+    <ellipse cx="230" cy="70" rx="60" ry="15" fill="rgba(46,196,182,0.15)"/>
+  </svg>
+  <svg class="mountains" viewBox="0 0 800 180" preserveAspectRatio="none">
+    <path d="M0,180 L0,120 L60,80 L120,110 L180,60 L240,90 L300,40 L360,100 L420,70 L480,110 L540,50 L600,90 L660,60 L720,100 L780,70 L800,110 L800,180 Z"
+          fill="rgba(46,196,182,0.3)"/>
+    <path d="M0,180 L0,150 L80,120 L160,140 L240,100 L320,130 L400,90 L480,140 L560,110 L640,140 L720,120 L800,150 L800,180 Z"
+          fill="rgba(26,58,138,0.3)"/>
+  </svg>
+</div>
+
+<div class="garden-row top" id="gardenTop"></div>
+<div class="garden-row bottom" id="gardenBottom"></div>
+
+<!-- شخصیت راهنما -->
+<div class="guide-char" id="guideChar">🦜</div>
+<div class="guide-bubble" id="guideBubble"></div>
+
+<!-- جعبه جایزه روزانه -->
+<div class="daily-gift" id="dailyGift" title="جایزه روزانه">🎁</div>
+
+<!-- چالش روزانه -->
+<div class="daily-challenge-badge" id="dailyChallenge" title="چالش روزانه" style="display:none">🎯</div>
+
+<!-- Combo indicator -->
+<div class="combo-indicator" id="comboIndicator"></div>
+
+<!-- ============================================================
+     اپ اصلی
+     ============================================================ -->
+<div id="app">
+  <header>
+    <div class="top-row">
+      <h1 id="appTitle">🌳 باغ ایرانی</h1>
+      <div class="profile-chip" id="profileChip">
+        <span class="avatar-mini" id="headerAvatar">🌱</span>
+        <span id="headerName">باغبان</span>
+      </div>
+      <button class="icon-btn" id="lightBtn" title="حالت روز/شب">🌙</button>
+      <button class="icon-btn" id="achBtn" title="دستاوردها">🏆</button>
+      <button class="icon-btn" id="setBtn" title="تنظیمات">⚙️</button>
+    </div>
+    <div class="level-info">
+      <span class="tag" id="levelTag">باغ ۱ — بهاری</span>
+      <span class="stage">مرحله <b id="stage">1</b> از <b id="stageTotal">10</b></span>
+    </div>
+    <div class="stats" style="margin-top:6px">
+      <div class="stat"><b id="timer">0:00</b><span>زمان</span></div>
+      <div class="stat"><b id="moves">0</b><span>حرکت</span></div>
+      <div class="stat"><b id="totalScore">0</b><span>امتیاز</span></div>
+    </div>
+    <div class="progress-dots" id="progressDots"></div>
+  </header>
+
+  <div class="power-ups">
+    <button class="power-btn" id="hintBtn" title="راهنما">💡<span class="count" id="hintCount">3</span></button>
+    <button class="power-btn" id="addTimeBtn" title="+۳۰ ثانیه">⏱️<span class="count" id="addTimeCount">2</span></button>
+    <button class="power-btn" id="undoBtn" title="بازگشت">↩️</button>
+    <button class="power-btn" id="restartBtn" title="شروع دوباره">🔄</button>
+    <button class="power-btn" id="mapBtn" title="نقشه پیشرفت">🗺️</button>
+  </div>
+
+  <div id="board"></div>
+
+  <footer>
+    <button class="ghost" id="menuBtn">☰ باغ‌ها</button>
+  </footer>
+</div>
+
+<!-- ============================================================
+     مودال خوش‌آمد و دریافت نام
+     ============================================================ -->
+<div class="modal" id="welcomeModal">
+  <div class="modal-card">
+    <div class="welcome-icon">🦜</div>
+    <h2>به باغ ایرانی خوش اومدی!</h2>
+    <p style="font-size:13px;line-height:2;opacity:0.8">
+      من <b style="color:#2ec4b6">طوطی باغبان</b> هستم 🌳<br>
+      قبل از شروع، اسمت رو به من بگو تا<br>
+      تو رو به عنوان باغبان این باغ ثبت کنم
+    </p>
+    <input type="text" class="name-input" id="nameInput" placeholder="اسمت رو بنویس..." maxlength="20" autocomplete="off">
+    <button class="btn-success" id="startGameBtn" style="margin-top:6px">شروع باغبانی 🌱</button>
+  </div>
+</div>
+
+<!-- ============================================================
+     پنل کاربری
+     ============================================================ -->
+<div class="modal" id="profileModal">
+  <div class="modal-card">
+    <h2>👤 پنل باغبان</h2>
+    <div class="profile-header">
+      <div class="profile-avatar" id="profileAvatar">🌱</div>
+      <div class="profile-info">
+        <div class="profile-name" id="profileName">باغبان</div>
+        <div class="profile-title" id="profileTitle">کارآموز باغ</div>
+        <div class="profile-rank" id="profileRank">رتبه: 🥉 برنز</div>
+      </div>
+    </div>
+
+    <div class="xp-bar">
+      <div class="xp-fill" id="xpFill" style="width:0%"></div>
+      <div class="xp-text" id="xpText">0 / 100 XP</div>
+    </div>
+
+    <div class="profile-stats-grid">
+      <div class="profile-stat-box">
+        <span class="psb-icon">🌳</span>
+        <div class="psb-value" id="psbStages">0</div>
+        <div class="psb-label">مراحل</div>
+      </div>
+      <div class="profile-stat-box">
+        <span class="psb-icon">⭐</span>
+        <div class="psb-value" id="psbStars">0</div>
+        <div class="psb-label">ستاره</div>
+      </div>
+      <div class="profile-stat-box">
+        <span class="psb-icon">💎</span>
+        <div class="psb-value" id="psbScore">0</div>
+        <div class="psb-label">امتیاز</div>
+      </div>
+      <div class="profile-stat-box">
+        <span class="psb-icon">⏱️</span>
+        <div class="psb-value" id="psbTime">0:00</div>
+        <div class="psb-label">زمان</div>
+      </div>
+      <div class="profile-stat-box">
+        <span class="psb-icon">🏆</span>
+        <div class="psb-value" id="psbAch">0</div>
+        <div class="psb-label">دستاورد</div>
+      </div>
+      <div class="profile-stat-box">
+        <span class="psb-icon">🔥</span>
+        <div class="psb-value" id="psbStreak">0</div>
+        <div class="psb-label">روز متوالی</div>
+      </div>
+    </div>
+
+    <div class="settings-section" style="margin-top:14px">
+      <h3>🌿 پیشرفت باغ‌ها</h3>
+      <div id="gardenProgressList"></div>
+    </div>
+
+    <div class="settings-section">
+      <h3>✏️ نام باغبان</h3>
+      <div class="setting-row">
+        <input type="text" class="name-input" id="profileNameInput" style="padding:8px 12px;font-size:13px;max-width:180px;text-align:right" maxlength="20">
+        <button class="ghost" id="saveNameBtn" style="padding:8px 14px;font-size:11px">ذخیره</button>
+      </div>
+    </div>
+
+    <div class="row-btns">
+      <button class="ghost" id="closeProfile">بستن</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     مودال‌ها
+     ============================================================ -->
+
+<div class="modal" id="winModal">
+  <div class="modal-card">
+    <h2 id="winTitle">✦ آفرین باغبان! ✦</h2>
+    <p>مرحله <b id="winStage">1</b> از باغ <b id="winLevel">1</b> رو کامل کردی</p>
+    <div class="time-box">
+      <span class="label">⏱ زمان شما</span>
+      <span class="value" id="winTime">0:00</span>
+      <span class="sub" id="winBest"></span>
+    </div>
+    <div class="stars" id="winStars"><span>★</span><span>★</span><span>★</span></div>
+    <div style="font-size:12px;color:var(--turquoise);font-weight:700" id="winScore"></div>
+    <div class="badges" id="winBadges"></div>
+    <div class="row-btns">
+      <button class="ghost" id="winRetry">↻ دوباره</button>
+      <button class="btn-primary" id="winNext">مرحله بعد ←</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="levelDoneModal">
+  <div class="modal-card">
+    <h2 id="levelDoneTitle">🏆 باغ کامل شد!</h2>
+    <p id="levelDoneText">باغ ۱ با موفقیت شکوفا شد</p>
+    <div class="time-box">
+      <span class="label">⏱ مجموع زمان این باغ</span>
+      <span class="value" id="levelTotalTime">0:00</span>
+      <span class="sub" id="levelAvgTime"></span>
+    </div>
+    <div class="stars" id="levelStars"></div>
+    <p id="levelStarsText" style="font-size:12px;opacity:0.65"></p>
+    <div class="row-btns">
+      <button class="ghost" id="backToMenu">باغ‌ها</button>
+      <button class="btn-success" id="nextLevel" style="display:none">باغ بعدی ←</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="gameDoneModal">
+  <div class="modal-card">
+    <h2>🎉 باغبان افسانه‌ای! 🎉</h2>
+    <p id="gameDoneText">هر ۶ باغ ایران رو شکوفا کردی!</p>
+    <p style="font-size:42px;margin:8px 0;letter-spacing:8px">🌳 🌾 🌳</p>
+    <div class="time-box">
+      <span class="label">⏱ مجموع زمان کل</span>
+      <span class="value" id="gameTotalTime">0:00</span>
+    </div>
+    <div class="stars" id="gameStars"></div>
+    <p>تو یه باغبان واقعی هستی 🏆</p>
+    <div class="row-btns">
+      <button class="btn-primary" id="gameDoneRestart">شروع دوباره</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="menuModal">
+  <div class="modal-card">
+    <h2>باغ‌های ایرانی</h2>
+    <p style="font-size:12px;opacity:0.75;max-width:340px;line-height:1.9">
+      میوه‌های باغی رو طوری بچین که هر ظرف فقط <b style="color:#d4af37">یه نوع میوه</b> داشته باشه 🌳
+    </p>
+    <div class="level-select" id="levelSelect"></div>
+    <button class="ghost" id="closeMenu" style="margin-top:12px">بستن</button>
+  </div>
+</div>
+
+<div class="modal" id="settingsModal">
+  <div class="modal-card">
+    <h2>⚙️ تنظیمات</h2>
+
+    <div class="settings-section">
+      <h3>🎨 ظاهر بازی</h3>
+      <div class="theme-grid" id="themeGrid">
+        <div class="theme-option active" data-theme="garden">
+          <span class="theme-icon">🌳</span>
+          باغ
+        </div>
+        <div class="theme-option" data-theme="classic">
+          <span class="theme-icon">⬜</span>
+          کلاسیک
+        </div>
+        <div class="theme-option" data-theme="robotic">
+          <span class="theme-icon">🤖</span>
+          روباتیک
+        </div>
+        <div class="theme-option" data-theme="kids">
+          <span class="theme-icon">🎈</span>
+          کودکانه
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <h3>🌙 حالت نمایش</h3>
+      <div class="setting-row">
+        <label>حالت شبانه</label>
+        <div class="switch" id="nightSwitch"></div>
+      </div>
+      <div class="setting-row">
+        <label>تشخیص خودکار (بر اساس ساعت)</label>
+        <div class="switch on" id="autoSwitch"></div>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <h3>🔊 صدا و لرزش</h3>
+      <div class="setting-row">
+        <label>صدای بازی</label>
+        <div class="switch on" id="soundSwitch"></div>
+      </div>
+      <div class="setting-row">
+        <label>موسیقی پس‌زمینه</label>
+        <div class="switch" id="musicSwitch"></div>
+      </div>
+      <div class="setting-row">
+        <label>لرزش</label>
+        <div class="switch on" id="vibrateSwitch"></div>
+      </div>
+      <div class="setting-row">
+        <label>شخصیت راهنما</label>
+        <div class="switch on" id="guideSwitch"></div>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <h3>📊 آمار شما</h3>
+      <div class="stat-list" id="statList"></div>
+    </div>
+
+    <div class="row-btns">
+      <button class="ghost" id="resetProgressBtn">🗑️ پاک کردن پیشرفت</button>
+      <button class="btn-primary" id="closeSettings">بستن</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="achievementsModal">
+  <div class="modal-card">
+    <h2>🏆 دستاوردها</h2>
+    <p style="font-size:12px;opacity:0.7">آچیومنت‌هایی که باز کردی</p>
+    <div class="achievements-grid" id="achievementsGrid"></div>
+    <button class="btn-primary" id="closeAchievements" style="margin-top:12px">بستن</button>
+  </div>
+</div>
+
+<div class="modal" id="mapModal">
+  <div class="modal-card">
+    <h2>🗺️ نقشه سفر</h2>
+    <p style="font-size:12px;opacity:0.7">مسیر تو در باغ‌های ایرانی</p>
+    <div class="map-path">
+      <div class="map-nodes" id="mapNodes"></div>
+    </div>
+    <button class="btn-primary" id="closeMap" style="margin-top:12px">بستن</button>
+  </div>
+</div>
+
+<div class="modal" id="giftModal">
+  <div class="modal-card">
+    <h2>🎁 جایزه روزانه</h2>
+    <p id="giftMsg">امروز یه جایزه برات داریم!</p>
+    <div style="font-size:64px;margin:10px 0" id="giftIcon">🎁</div>
+    <p style="font-size:14px;color:var(--turquoise);font-weight:700" id="giftReward"></p>
+    <button class="btn-success" id="claimGift">دریافت جایزه</button>
+  </div>
+</div>
+
+<!-- مودال چالش روزانه -->
+<div class="modal" id="challengeModal">
+  <div class="modal-card">
+    <h2>🎯 چالش روزانه</h2>
+    <p id="challengeDesc">امروز یه چالش ویژه برات داریم!</p>
+    <div style="font-size:56px;margin:8px 0" id="challengeIcon">⚡</div>
+    <div class="time-box">
+      <span class="label">پاداش</span>
+      <span class="value" id="challengeReward" style="font-size:18px">×۲ امتیاز</span>
+      <span class="sub" id="challengeSub">تا پایان امروز</span>
+    </div>
+    <div class="row-btns">
+      <button class="ghost" id="closeChallenge">بعداً</button>
+      <button class="btn-success" id="startChallenge">شروع چالش 🚀</button>
+    </div>
+  </div>
+</div>
+
+<!-- ذرات و Toast -->
+<div class="confetti-container" id="confettiBox"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================================
+// ✅ پیکربندی تم‌ها — تم اصلی: باغ
+// ============================================================
+const THEMES = {
+  garden: {
+    name: 'باغ',
+    guideChar: '🦜',
+    fruits: [
+      { id: 'sib',    emoji: '🍎', name: 'سیب' },
+      { id: 'angoor', emoji: '🍇', name: 'انگور' },
+      { id: 'porteghal', emoji: '🍊', name: 'پرتقال' },
+      { id: 'limoo',  emoji: '🍋', name: 'لیمو' },
+      { id: 'gilas',  emoji: '🍒', name: 'گیلاس' },
+      { id: 'tut',    emoji: '🍓', name: 'توت‌فرنگی' },
+      { id: 'holu',   emoji: '🍑', name: 'هلو' },
+      { id: 'golabi', emoji: '🍐', name: 'گلابی' },
+    ],
+  },
+  classic: {
+    name: 'کلاسیک',
+    guideChar: '💭',
+    fruits: [
+      { id: 'circle',  emoji: '●', name: 'دایره' },
+      { id: 'square',  emoji: '■', name: 'مربع' },
+      { id: 'triangle', emoji: '▲', name: 'مثلث' },
+      { id: 'diamond', emoji: '◆', name: 'الماس' },
+      { id: 'star',    emoji: '★', name: 'ستاره' },
+      { id: 'hexa',    emoji: '⬢', name: 'شش‌ضلعی' },
+      { id: 'cross',   emoji: '✚', name: 'صلیب' },
+      { id: 'ring',    emoji: '○', name: 'حلقه' },
+    ],
+  },
+  robotic: {
+    name: 'روباتیک',
+    guideChar: '🤖',
+    fruits: [
+      { id: 'gear',    emoji: '⚙️', name: 'چرخ‌دنده' },
+      { id: 'battery', emoji: '🔋', name: 'باتری' },
+      { id: 'chip',    emoji: '💾', name: 'حافظه' },
+      { id: 'plug',    emoji: '🔌', name: 'سیم' },
+      { id: 'wrench',  emoji: '🔧', name: 'پیچ' },
+      { id: 'magnet',  emoji: '🧲', name: 'مغناطیس' },
+      { id: 'bulb',    emoji: '💡', name: 'لامپ' },
+      { id: 'antenna', emoji: '📡', name: 'آنتن' },
+    ],
+  },
+  kids: {
+    name: 'کودکانه',
+    guideChar: '🐱',
+    fruits: [
+      { id: 'balloon', emoji: '🎈', name: 'بادکنک' },
+      { id: 'gift',    emoji: '🎁', name: 'کادو' },
+      { id: 'teddy',   emoji: '🧸', name: 'خرس' },
+      { id: 'paint',   emoji: '🎨', name: 'رنگ' },
+      { id: 'circus',  emoji: '🎪', name: 'سرک' },
+      { id: 'unicorn', emoji: '🦄', name: 'اسب' },
+      { id: 'ball',    emoji: '⚽', name: 'توپ' },
+      { id: 'target',  emoji: '🎯', name: 'هدف' },
+    ],
+  },
+};
+
+// ============================================================
+// لقب‌ها و آواتارها
+// ============================================================
+const TITLES = [
+  { min: 0,    title: 'کارآموز باغ',      avatar: '🌱' },
+  { min: 100,  title: 'باغبان تازه‌کار',  avatar: '🌿' },
+  { min: 300,  title: 'باغبان ماهر',      avatar: '🌳' },
+  { min: 600,  title: 'باغبان حرفه‌ای',  avatar: '🌲' },
+  { min: 1000, title: 'استاد باغبان',     avatar: '🎄' },
+  { min: 1500, title: 'افسانه باغ',       avatar: '👑' },
+];
+
+const RANKS = [
+  { min: 0,    name: '🥉 برنز' },
+  { min: 300,  name: '🥈 نقره' },
+  { min: 800,  name: '🥇 طلا' },
+  { min: 1500, name: '💎 پلاتینیوم' },
+  { min: 2500, name: '💠 الماس' },
+];
+
+function getTitleByScore(score) {
+  let t = TITLES[0];
+  for (const x of TITLES) if (score >= x.min) t = x;
+  return t;
+}
+function getRankByScore(score) {
+  let r = RANKS[0];
+  for (const x of RANKS) if (score >= x.min) r = x;
+  return r;
+}
+
+// ============================================================
+// صدا و لرزش
+// ============================================================
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let audioCtx = null;
+let settings = {
+  sound: true, music: false, vibrate: true, guide: true,
+  theme: 'garden', lightMode: false, autoLight: true,
+  hints: 3, addTime: 2
+};
+
+function loadSettings() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('baghIran_settings') || '{}');
+    Object.assign(settings, saved);
+    // اطمینان از اینکه تم معتبره
+    if (!THEMES[settings.theme]) settings.theme = 'garden';
+  } catch(e) {}
+}
+function saveSettings() {
+  localStorage.setItem('baghIran_settings', JSON.stringify(settings));
+}
+
+function initAudio() {
+  if (!audioCtx) audioCtx = new AudioCtx();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+}
+function playTone(freq, duration = 0.15, type = 'sine', volume = 0.15) {
+  if (!settings.sound || !audioCtx) return;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = type;
+  osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(freq * 0.7, audioCtx.currentTime + duration);
+  gain.gain.setValueAtTime(volume, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+  osc.connect(gain); gain.connect(audioCtx.destination);
+  osc.start(); osc.stop(audioCtx.currentTime + duration);
+}
+function sfxPour() { playTone(320, 0.18, 'sine', 0.12); setTimeout(() => playTone(280, 0.12, 'sine', 0.1), 60); }
+function sfxPick() { playTone(520, 0.08, 'triangle', 0.1); }
+function sfxWin() { [523, 659, 784, 1047].forEach((f, i) => setTimeout(() => playTone(f, 0.25, 'sine', 0.15), i * 100)); }
+function sfxError() { playTone(180, 0.2, 'sawtooth', 0.08); }
+function sfxLevelUp() { [392, 523, 659, 784, 1047, 1319].forEach((f, i) => setTimeout(() => playTone(f, 0.3, 'triangle', 0.14), i * 90)); }
+function sfxGift() { [523, 659, 784, 1047, 1319].forEach((f, i) => setTimeout(() => playTone(f, 0.2, 'sine', 0.14), i * 80)); }
+
+function vib(pattern) {
+  if (settings.vibrate && 'vibrate' in navigator) navigator.vibrate(pattern);
+}
+
+// ============================================================
+// موسیقی پس‌زمینه
+// ============================================================
+let musicNodes = [];
+let musicTimer = null;
+function startMusic() {
+  if (!audioCtx || !settings.music) return;
+  stopMusic();
+  const notes = [261.63, 329.63, 392.00, 523.25, 392.00, 329.63];
+  let idx = 0;
+  musicTimer = setInterval(() => {
+    if (!settings.music || !audioCtx) return;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = notes[idx % notes.length];
+    gain.gain.setValueAtTime(0.0001, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.04, audioCtx.currentTime + 0.5);
+    gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 2.5);
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.start(); osc.stop(audioCtx.currentTime + 2.6);
+    musicNodes.push(osc);
+    idx++;
+  }, 2500);
+}
+function stopMusic() {
+  if (musicTimer) { clearInterval(musicTimer); musicTimer = null; }
+  musicNodes.forEach(n => { try { n.stop(); } catch(e) {} });
+  musicNodes = [];
+}
+
+// ============================================================
+// ✅ بروزرسانی آیتم‌های تم
+// ============================================================
+function applyTheme() {
+  const theme = THEMES[settings.theme];
+  document.body.className = document.body.className.replace(/theme-\w+/g, '').trim();
+  document.body.classList.add(`theme-${settings.theme}`);
+  document.querySelectorAll('.theme-option').forEach(el => {
+    el.classList.toggle('active', el.dataset.theme === settings.theme);
+  });
+  $('guideChar').textContent = theme.guideChar;
+}
+
+// ============================================================
+// سطح‌ها
+// ============================================================
+const LEVELS = [
+  { colors: 3, capacity: 4, empty: 2, stages: 10, theme: '#2ec4b6' },
+  { colors: 4, capacity: 4, empty: 2, stages: 10, theme: '#f0a500' },
+  { colors: 4, capacity: 4, empty: 2, stages: 10, theme: '#c1272d' },
+  { colors: 5, capacity: 4, empty: 2, stages: 10, theme: '#4a90e2' },
+  { colors: 5, capacity: 5, empty: 2, stages: 10, theme: '#9b59b6' },
+  { colors: 6, capacity: 5, empty: 2, stages: 10, theme: '#d4af37' },
+];
+
+const LEVEL_NAMES = ['بهاری', 'تابستانی', 'پاییزی', 'زمستانی', 'افسانه‌ای', 'بهشتی'];
+const LEVEL_ICONS = ['🌸', '☀️', '🍁', '❄️', '✨', '👑'];
+
+const ACHIEVEMENTS = [
+  { id: 'first_win', icon: '🌱', name: 'اولین شکوفه', desc: 'اولین مرحله رو کامل کن' },
+  { id: 'no_hint_10', icon: '🧠', name: 'ذهن پولادین', desc: '۱۰ مرحله بدون راهنما' },
+  { id: 'fast_5', icon: '⚡', name: 'برق آسا', desc: '۵ مرحله زیر ۱۵ ثانیه' },
+  { id: 'perfect_bagh', icon: '🏆', name: 'کامل', desc: 'یه باغ رو با ۳ ستاره کامل کن' },
+  { id: 'all_bagh1', icon: '🌸', name: 'اولی تمام', desc: 'باغ اول رو تموم کن' },
+  { id: 'all_bagh2', icon: '☀️', name: 'دومی تمام', desc: 'باغ دوم رو تموم کن' },
+  { id: 'all_bagh3', icon: '🍁', name: 'سومی تمام', desc: 'باغ سوم رو تموم کن' },
+  { id: 'all_bagh4', icon: '❄️', name: 'چهارمی تمام', desc: 'باغ چهارم رو تموم کن' },
+  { id: 'all_bagh5', icon: '✨', name: 'پنجمی تمام', desc: 'باغ پنجم رو تموم کن' },
+  { id: 'all_bagh6', icon: '👑', name: 'همه تمام', desc: 'همه باغ‌ها رو تموم کن' },
+  { id: 'no_undo_20', icon: '🎯', name: 'دقت بی‌نقص', desc: '۲۰ مرحله بدون undo' },
+  { id: 'fast_master', icon: '🚀', name: 'شاهین سرعت', desc: 'مرحله‌ای زیر ۱۰ ثانیه' },
+  { id: 'score_1000', icon: '💎', name: 'امتیاز هزار', desc: 'به ۱۰۰۰ امتیاز برس' },
+  { id: 'all_stars', icon: '⭐', name: 'ستاره‌چین', desc: 'همه مراحل ۳ ستاره' },
+];
+
+const $ = id => document.getElementById(id);
+const board = $('board');
+
+let state = {
+  levelIdx: 0, stage: 1, bottles: [], capacity: 4,
+  history: [], selected: null, moves: 0,
+  startTime: 0, timerId: null, elapsed: 0, won: false,
+  usedHint: false, usedUndo: false, usedAddTime: false,
+  hints: 3, addTime: 2,
+  fruitMap: {},
+  streakCount: 0, comboCount: 0, lastMoveTime: 0,
+  sessionScore: 0,
+  isChallenge: false,
+  challengeMultiplier: 1,
+};
+
+let playerName = 'باغبان';
+
+// ============================================================
+// ذخیره و بارگذاری
+// ============================================================
+function getProgress() {
+  try { return JSON.parse(localStorage.getItem('baghIran_progress') || '{}'); }
+  catch(e) { return {}; }
+}
+function saveProgress(p) { localStorage.setItem('baghIran_progress', JSON.stringify(p)); }
+function getTotalScore() { return parseInt(localStorage.getItem('baghIran_totalScore') || '0', 10); }
+function addScore(s) {
+  const total = getTotalScore() + s;
+  localStorage.setItem('baghIran_totalScore', String(total));
+  return total;
+}
+function getAchievements() {
+  try { return JSON.parse(localStorage.getItem('baghIran_ach') || '{}'); }
+  catch(e) { return {}; }
+}
+function unlockAchievement(id) {
+  const a = getAchievements();
+  if (!a[id]) {
+    a[id] = Date.now();
+    localStorage.setItem('baghIran_ach', JSON.stringify(a));
+    const ach = ACHIEVEMENTS.find(x => x.id === id);
+    if (ach) {
+      showToast(`🏆 دستاورد: ${ach.name}`, 'gold');
+      sfxGift();
+      setTimeout(() => throwConfetti(20), 300);
+    }
+  }
+}
+function checkAchievements() {
+  const p = getProgress();
+  const totalScore = getTotalScore();
+  if (Object.keys(p).length > 0) unlockAchievement('first_win');
+  const noHintCount = parseInt(localStorage.getItem('baghIran_noHint') || '0', 10);
+  if (noHintCount >= 10) unlockAchievement('no_hint_10');
+  const fastCount = parseInt(localStorage.getItem('baghIran_fast') || '0', 10);
+  if (fastCount >= 5) unlockAchievement('fast_5');
+  const noUndoCount = parseInt(localStorage.getItem('baghIran_noUndo') || '0', 10);
+  if (noUndoCount >= 20) unlockAchievement('no_undo_20');
+  if (totalScore >= 1000) unlockAchievement('score_1000');
+  for (let l = 0; l < LEVELS.length; l++) {
+    let allDone = true;
+    for (let s = 1; s <= LEVELS[l].stages; s++) {
+      if (!localStorage.getItem(`baghIran_done_L${l}_S${s}`)) { allDone = false; break; }
+    }
+    if (allDone) {
+      if (l === 0) unlockAchievement('all_bagh1');
+      if (l === 1) unlockAchievement('all_bagh2');
+      if (l === 2) unlockAchievement('all_bagh3');
+      if (l === 3) unlockAchievement('all_bagh4');
+      if (l === 4) unlockAchievement('all_bagh5');
+      if (l === 5) unlockAchievement('all_bagh6');
+    }
+  }
+}
+
+function applyLightMode() {
+  let isLight = settings.lightMode;
+  if (settings.autoLight) {
+    const h = new Date().getHours();
+    isLight = h >= 7 && h < 19;
+  }
+  document.body.classList.toggle('light-mode', isLight);
+  $('lightBtn').textContent = isLight ? '☀️' : '🌙';
+  const nightSwitch = $('nightSwitch');
+  if (nightSwitch) nightSwitch.classList.toggle('on', settings.lightMode);
+}
+
+// ============================================================
+// پس‌زمینه
+// ============================================================
+function initStarsBg() {
+  const box = $('starsBg');
+  box.innerHTML = '';
+  for (let i = 0; i < 60; i++) {
+    const el = document.createElement('div');
+    el.className = 'star-bg';
+    el.style.left = `${Math.random() * 100}%`;
+    el.style.top = `${Math.random() * 60}%`;
+    el.style.animationDelay = `${Math.random() * 3}s`;
+    box.appendChild(el);
+  }
+}
+function initClouds() {
+  const box = $('clouds');
+  box.innerHTML = '';
+  for (let i = 0; i < 4; i++) {
+    const el = document.createElement('div');
+    el.className = 'cloud';
+    el.textContent = '☁️';
+    el.style.top = `${10 + Math.random() * 40}%`;
+    el.style.animationDuration = `${30 + Math.random() * 30}s`;
+    el.style.animationDelay = `${Math.random() * 20}s`;
+    box.appendChild(el);
+  }
+}
+function initGarden() {
+  const row1 = ['🌲', '🌳', '🌴', '🌲'];
+  const row2 = ['🌾', '🌳', '🍎', '🌴', '🌾'];
+  $('gardenTop').innerHTML = row1.map(t => `<div class="tree">${t}</div>`).join('');
+  $('gardenBottom').innerHTML = row2.map(t => `<div class="tree">${t}</div>`).join('');
+}
+
+// ============================================================
+// شخصیت راهنما
+// ============================================================
+function getGuideMessages() {
+  return [
+    `سلام ${playerName}! من راهنمای تو هستم`,
+    `${playerName} جان، روی یه ظرف کلیک کن`,
+    'میوه‌های هم‌نوع رو کنار هم بذار!',
+    'هر ظرف فقط یه نوع میوه داشته باشه',
+    `اگه گیر کردی ${playerName}، از 💡 استفاده کن`,
+    `آفرین ${playerName}! داری حرفه‌ای می‌شی 🌟`,
+    'برای امتیاز بیشتر، سریع‌تر بازی کن',
+    `تو یه باغبان واقعی هستی ${playerName}!`,
+  ];
+}
+let guideMsgIdx = 0;
+let guideTimer = null;
+
+function showGuideBubble(msg) {
+  if (!settings.guide) return;
+  const bubble = $('guideBubble');
+  bubble.textContent = msg;
+  bubble.classList.add('show');
+  clearTimeout(guideTimer);
+  guideTimer = setTimeout(() => bubble.classList.remove('show'), 4000);
+}
+function cycleGuideMessage() {
+  const msgs = getGuideMessages();
+  showGuideBubble(msgs[guideMsgIdx % msgs.length]);
+  guideMsgIdx++;
+}
+
+// ============================================================
+// Toast
+// ============================================================
+let toastTimer;
+function showToast(msg, type = '') {
+  const t = $('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + type;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ============================================================
+// ذرات جشن
+// ============================================================
+function throwConfetti(count = 30) {
+  const box = $('confettiBox');
+  const theme = THEMES[settings.theme];
+  const items = theme.fruits.map(f => f.emoji);
+  while (items.length < 6) items.push('✨', '❁', '◆', '⭐');
+  for (let i = 0; i < count; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti';
+    el.textContent = items[Math.floor(Math.random() * items.length)];
+    el.style.left = `${Math.random() * 100}%`;
+    el.style.fontSize = `${16 + Math.random() * 20}px`;
+    const dur = 2.5 + Math.random() * 2;
+    el.style.animationDuration = dur + 's';
+    el.style.animationDelay = (Math.random() * 0.5) + 's';
+    box.appendChild(el);
+    setTimeout(() => el.remove(), (dur + 1) * 1000);
+  }
+}
+
+// ============================================================
+// Combo
+// ============================================================
+function showCombo(count) {
+  const el = $('comboIndicator');
+  el.textContent = `×${count} COMBO!`;
+  el.classList.remove('show');
+  void el.offsetWidth;
+  el.classList.add('show');
+}
+
+// ============================================================
+// زمان
+// ============================================================
+function fmtTime(sec) {
+  const m = Math.floor(sec / 60);
+  const s = Math.floor(sec % 60);
+  return `${m}:${s.toString().padStart(2,'0')}`;
+}
+function startTimer() {
+  stopTimer();
+  state.startTime = Date.now();
+  state.elapsed = 0;
+  state.timerId = setInterval(() => {
+    state.elapsed = Math.floor((Date.now() - state.startTime) / 1000);
+    $('timer').textContent = fmtTime(state.elapsed);
+  }, 250);
+}
+function stopTimer() {
+  if (state.timerId) { clearInterval(state.timerId); state.timerId = null; }
+}
+
+// ============================================================
+// تولید مرحله
+// ============================================================
+function generateStage(levelIdx, stageNum) {
+  const cfg = LEVELS[levelIdx];
+  const capacity = cfg.capacity;
+  const stageProgress = (stageNum - 1) / (cfg.stages - 1);
+  const minColors = Math.max(2, cfg.colors - 1);
+  const colorCount = Math.round(minColors + (cfg.colors - minColors) * stageProgress);
+
+  const themeFruits = THEMES[settings.theme].fruits;
+  const fruitIndices = [];
+  for (let i = 0; i < Math.min(colorCount, themeFruits.length); i++) fruitIndices.push(i);
+
+  state.fruitMap = {};
+  fruitIndices.forEach(fi => { state.fruitMap[fi] = themeFruits[fi]; });
+
+  const pool = [];
+  fruitIndices.forEach(fi => {
+    for (let i = 0; i < capacity; i++) pool.push(fi);
+  });
+
+  let bottles, attempts = 0;
+  do {
+    shuffle(pool);
+    bottles = [];
+    for (let i = 0; i < pool.length; i += capacity) {
+      bottles.push(pool.slice(i, i + capacity));
+    }
+    for (let i = 0; i < cfg.empty; i++) bottles.push([]);
+    attempts++;
+  } while ((isSolved(bottles, capacity) || tooEasy(bottles, capacity)) && attempts < 200);
+
+  return bottles;
+}
+function tooEasy(bottles, capacity) {
+  let sortedCount = 0;
+  for (const b of bottles) {
+    if (b.length === capacity && b.every(c => c === b[0])) sortedCount++;
+  }
+  return sortedCount > 1;
+}
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+}
+function isSolved(bottles, capacity) {
+  return bottles.every(b =>
+    b.length === 0 || (b.length === capacity && b.every(c => c === b[0]))
+  );
+}
+
+// ============================================================
+// رندر
+// ============================================================
+function render() {
+  board.innerHTML = '';
+
+  state.bottles.forEach((bottle, idx) => {
+    const el = document.createElement('div');
+    el.className = 'bottle';
+    el.style.animationDelay = (idx * 0.05) + 's';
+    if (state.selected === idx) el.classList.add('lifted');
+
+    const isComplete = bottle.length === state.capacity && bottle.every(c => c === bottle[0]);
+    if (isComplete) el.classList.add('done');
+
+    let cellsHTML = '';
+    for (let i = 0; i < state.capacity; i++) {
+      const fi = bottle[i];
+      const isFilled = fi !== undefined && fi !== null;
+      let cls = 'cell';
+      let content = '';
+      if (isFilled) {
+        const fruit = state.fruitMap[fi];
+        if (fruit) {
+          cls += ` fruit-${fruit.id} filled`;
+          content = fruit.emoji;
+        }
+      }
+      cellsHTML += `<div class="${cls}">${content}</div>`;
+    }
+
+    let labelHTML = '';
+    if (isComplete) {
+      const fruit = state.fruitMap[bottle[0]];
+      labelHTML = `<div class="fruit-label">${fruit ? fruit.name : ''}</div>`;
+    }
+
+    el.innerHTML = `
+      <div class="neck"></div>
+      <div class="glass">${cellsHTML}</div>
+      ${labelHTML}
+    `;
+    el.addEventListener('click', () => onBottleClick(idx));
+    board.appendChild(el);
+  });
+
+  $('moves').textContent = state.moves;
+  $('stage').textContent = state.stage;
+  $('stageTotal').textContent = LEVELS[state.levelIdx].stages;
+  const challengeTag = state.isChallenge ? ' <span class="challenge-tag">چالش ×۲</span>' : '';
+  $('levelTag').innerHTML = `باغ ${state.levelIdx + 1} — ${LEVEL_NAMES[state.levelIdx]}${challengeTag}`;
+  $('hintCount').textContent = state.hints;
+  $('addTimeCount').textContent = state.addTime;
+  $('hintBtn').disabled = state.hints <= 0;
+  $('addTimeBtn').disabled = state.addTime <= 0;
+  $('undoBtn').disabled = state.history.length === 0;
+  $('timer').textContent = fmtTime(state.elapsed);
+  $('totalScore').textContent = getTotalScore();
+  renderProgressDots();
+  applyThemeBg();
+  updateHeaderProfile();
+}
+function renderProgressDots() {
+  const cfg = LEVELS[state.levelIdx];
+  let html = '';
+  for (let s = 1; s <= cfg.stages; s++) {
+    const done = localStorage.getItem(`baghIran_done_L${state.levelIdx}_S${s}`);
+    const cls = s === state.stage ? 'current' : (done ? 'done' : '');
+    html += `<div class="dot ${cls}"></div>`;
+  }
+  $('progressDots').innerHTML = html;
+}
+function applyThemeBg() {
+  const cfg = LEVELS[state.levelIdx];
+  const color = cfg.theme;
+  if (!document.body.classList.contains('light-mode')) {
+    document.body.style.background = `radial-gradient(circle at 50% -10%, ${hexToRgba(color, 0.25)} 0%, #0a1428 55%, #050a18 100%)`;
+  } else {
+    document.body.style.background = `radial-gradient(circle at 50% -10%, ${hexToRgba(color, 0.15)} 0%, #e8f4f8 55%, #f0f8fa 100%)`;
+  }
+}
+function hexToRgba(hex, a) {
+  const r = parseInt(hex.slice(1,3), 16);
+  const g = parseInt(hex.slice(3,5), 16);
+  const b = parseInt(hex.slice(5,7), 16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+
+function updateHeaderProfile() {
+  const score = getTotalScore();
+  const t = getTitleByScore(score);
+  $('headerAvatar').textContent = t.avatar;
+  $('headerName').textContent = playerName;
+}
+
+// ============================================================
+// منطق
+// ============================================================
+function onBottleClick(idx) {
+  if (state.won) return;
+  initAudio();
+  const bottles = state.bottles;
+
+  if (state.selected === null) {
+    if (bottles[idx].length === 0) return;
+    if (bottles[idx].length === state.capacity &&
+        bottles[idx].every(c => c === bottles[idx][0])) return;
+    state.selected = idx;
+    sfxPick(); vib(15);
+    render();
+    return;
+  }
+  if (state.selected === idx) {
+    state.selected = null;
+    render();
+    return;
+  }
+  const moved = tryPour(state.selected, idx);
+  if (moved) {
+    state.history.push({
+      bottles: state.bottles.map(b => [...b]),
+      moves: state.moves
+    });
+    state.moves++;
+    sfxPour(); vib(20);
+    state.selected = null;
+
+    // Combo system
+    const now = Date.now();
+    if (now - state.lastMoveTime < 2000) {
+      state.comboCount++;
+      if (state.comboCount >= 3) {
+        showCombo(state.comboCount);
+        state.sessionScore += state.comboCount * 5;
+      }
+    } else {
+      state.comboCount = 1;
+    }
+    state.lastMoveTime = now;
+
+    render();
+    checkWin();
+  } else {
+    sfxError(); vib([20, 30, 20]);
+    state.comboCount = 0;
+    const el = board.querySelectorAll('.bottle')[idx];
+    if (el) {
+      el.classList.add('shake');
+      setTimeout(() => el.classList.remove('shake'), 400);
+    }
+    if (bottles[idx].length > 0 &&
+        !(bottles[idx].length === state.capacity &&
+          bottles[idx].every(c => c === bottles[idx][0]))) {
+      state.selected = idx;
+    } else {
+      state.selected = null;
+    }
+    render();
+  }
+}
+function tryPour(from, to) {
+  const src = state.bottles[from];
+  const dst = state.bottles[to];
+  if (src.length === 0) return false;
+  if (dst.length >= state.capacity) return false;
+  const color = src[src.length - 1];
+  if (dst.length > 0 && dst[dst.length - 1] !== color) return false;
+  let count = 0;
+  for (let i = src.length - 1; i >= 0; i--) {
+    if (src[i] === color) count++;
+    else break;
+  }
+  const space = state.capacity - dst.length;
+  const moveCount = Math.min(count, space);
+  for (let i = 0; i < moveCount; i++) dst.push(src.pop());
+  return true;
+}
+
+// ============================================================
+// راهنما
+// ============================================================
+function findHintMove() {
+  const bottles = state.bottles;
+  const cap = state.capacity;
+  for (let from = 0; from < bottles.length; from++) {
+    const src = bottles[from];
+    if (src.length === 0) continue;
+    const color = src[src.length - 1];
+    let count = 0;
+    for (let i = src.length - 1; i >= 0; i--) {
+      if (src[i] === color) count++; else break;
+    }
+    for (let to = 0; to < bottles.length; to++) {
+      if (from === to) continue;
+      const dst = bottles[to];
+      if (dst.length === 0) continue;
+      if (dst[dst.length - 1] !== color) continue;
+      if (dst.length + count === cap) return { from, to };
+    }
+  }
+  for (let from = 0; from < bottles.length; from++) {
+    const src = bottles[from];
+    if (src.length === 0) continue;
+    const color = src[src.length - 1];
+    let count = 0;
+    for (let i = src.length - 1; i >= 0; i--) {
+      if (src[i] === color) count++; else break;
+    }
+    if (count === src.length && count < cap) continue;
+    for (let to = 0; to < bottles.length; to++) {
+      if (from === to) continue;
+      if (bottles[to].length === 0) return { from, to };
+    }
+  }
+  for (let from = 0; from < bottles.length; from++) {
+    const src = bottles[from];
+    if (src.length === 0) continue;
+    const color = src[src.length - 1];
+    if (src.every(c => c === color)) continue;
+    for (let to = 0; to < bottles.length; to++) {
+      if (from === to) continue;
+      const dst = bottles[to];
+      if (dst.length >= cap) continue;
+      if (dst.length > 0 && dst[dst.length - 1] !== color) continue;
+      return { from, to };
+    }
+  }
+  return null;
+}
+function showHint() {
+  if (state.hints <= 0) return;
+  const move = findHintMove();
+  if (!move) { showToast('حرکتی پیدا نشد!', 'anar'); return; }
+  state.hints--;
+  state.usedHint = true;
+  const els = board.querySelectorAll('.bottle');
+  if (els[move.from]) els[move.from].classList.add('lifted');
+  if (els[move.to]) {
+    els[move.to].classList.add('lifted');
+    els[move.to].style.filter = 'drop-shadow(0 0 20px #f0a500)';
+  }
+  showToast('راهنما: از ظرف چشمک‌زن بریز!', 'gold');
+  sfxPick();
+  setTimeout(() => render(), 1800);
+}
+function useAddTime() {
+  if (state.addTime <= 0) return;
+  state.addTime--;
+  state.usedAddTime = true;
+  state.startTime -= 30000;
+  showToast('+۳۰ ثانیه اضافه شد!', 'gold');
+  sfxPick(); vib(30);
+  render();
+}
+
+// ============================================================
+// چک برد
+// ============================================================
+function checkWin() {
+  if (!isSolved(state.bottles, state.capacity)) return;
+
+  state.won = true;
+  stopTimer();
+  sfxWin();
+  vib([40, 60, 40, 60, 80]);
+  throwConfetti(40);
+
+  const stars = calcStars(state.elapsed, state.levelIdx, state.stage);
+
+  let score = Math.max(10, Math.round(1000 / Math.max(10, state.elapsed)));
+  score += stars * 20;
+  if (!state.usedHint) score += 30;
+  if (!state.usedUndo) score += 20;
+  if (!state.usedAddTime) score += 15;
+  score += state.levelIdx * 10;
+  score += state.sessionScore;
+  if (state.isChallenge) score *= 2;
+  const newTotal = addScore(score);
+
+  if (!state.usedHint) {
+    const c = parseInt(localStorage.getItem('baghIran_noHint') || '0', 10) + 1;
+    localStorage.setItem('baghIran_noHint', String(c));
+  }
+  if (!state.usedUndo) {
+    const c = parseInt(localStorage.getItem('baghIran_noUndo') || '0', 10) + 1;
+    localStorage.setItem('baghIran_noUndo', String(c));
+  }
+  if (state.elapsed < 15) {
+    const c = parseInt(localStorage.getItem('baghIran_fast') || '0', 10) + 1;
+    localStorage.setItem('baghIran_fast', String(c));
+  }
+  if (state.elapsed < 10) unlockAchievement('fast_master');
+
+  const timeKey = `baghIran_time_L${state.levelIdx}_S${state.stage}`;
+  const bestKey = `baghIran_best_L${state.levelIdx}_S${state.stage}`;
+  localStorage.setItem(timeKey, String(state.elapsed));
+  const prevBest = parseInt(localStorage.getItem(bestKey) || '0', 10);
+  if (!prevBest || state.elapsed < prevBest) {
+    localStorage.setItem(bestKey, String(state.elapsed));
+  }
+  localStorage.setItem(`baghIran_done_L${state.levelIdx}_S${state.stage}`, '1');
+
+  const badges = [];
+  if (stars === 3) badges.push('⚡ فوق‌سریع');
+  if (!state.usedUndo && state.moves <= state.capacity * 4) badges.push('🎯 دقیق');
+  if (!state.usedHint) badges.push('🧠 بدون راهنما');
+  if (!state.usedAddTime) badges.push('⏱ بی‌توقف');
+  if (state.moves <= state.capacity * 2) badges.push('👑 ماهر');
+  if (state.isChallenge) badges.push('🎯 چالش روزانه');
+
+  checkAchievements();
+
+  const encourage = stars === 3 ? `واو ${playerName}! فوق‌سریع بودی! ⚡` :
+                    stars === 2 ? `خوب بود ${playerName}! ادامه بده 💪` :
+                    `تموم شد ${playerName}! تلاش بعدی بهتره 🌱`;
+  showGuideBubble(encourage);
+
+  setTimeout(() => {
+    $('winStage').textContent = state.stage;
+    $('winLevel').textContent = state.levelIdx + 1;
+    $('winTime').textContent = fmtTime(state.elapsed);
+    $('winScore').textContent = `+${score} امتیاز (کل: ${newTotal})`;
+    const starEls = $('winStars').querySelectorAll('span');
+    starEls.forEach(s => s.classList.remove('on'));
+    setTimeout(() => {
+      starEls.forEach((s, i) => s.classList.toggle('on', i < stars));
+    }, 100);
+    $('winBest').textContent = prevBest
+      ? `بهترین: ${fmtTime(Math.min(prevBest, state.elapsed))}`
+      : 'اولین بار! 🏅';
+
+    const badgeBox = $('winBadges');
+    badgeBox.innerHTML = '';
+    badges.forEach((b, i) => {
+      const el = document.createElement('div');
+      el.className = 'badge';
+      el.textContent = b;
+      el.style.animationDelay = (0.6 + i * 0.15) + 's';
+      badgeBox.appendChild(el);
+    });
+
+    const cfg = LEVELS[state.levelIdx];
+    const btn = $('winNext');
+    btn.textContent = state.stage < cfg.stages
+      ? 'مرحله بعد ←'
+      : `پایان باغ ${state.levelIdx + 1} →`;
+    openModal('winModal');
+  }, 500);
+}
+
+function calcStars(sec, levelIdx, stage) {
+  const base = 20 + (levelIdx * 15) + (stage * 4);
+  if (sec <= base * 0.6) return 3;
+  if (sec <= base * 1.1) return 2;
+  return 1;
+}
+
+// ============================================================
+// مودال
+// ============================================================
+function closeAllModals() {
+  document.querySelectorAll('.modal').forEach(m => m.classList.remove('show'));
+}
+function openModal(id) {
+  closeAllModals();
+  void $(id).offsetWidth;
+  $(id).classList.add('show');
+}
+
+// ============================================================
+// بارگذاری
+// ============================================================
+function loadStage(levelIdx, stage) {
+  closeAllModals();
+  state.levelIdx = levelIdx;
+  state.stage = stage;
+  state.capacity = LEVELS[levelIdx].capacity;
+  state.bottles = generateStage(levelIdx, stage);
+  state.history = [];
+  state.selected = null;
+  state.moves = 0;
+  state.won = false;
+  state.elapsed = 0;
+  state.usedHint = false;
+  state.usedUndo = false;
+  state.usedAddTime = false;
+  state.hints = 3 + parseInt(localStorage.getItem('baghIran_bonusHints') || '0', 10);
+  state.addTime = 2 + parseInt(localStorage.getItem('baghIran_bonusTime') || '0', 10);
+  localStorage.removeItem('baghIran_bonusHints');
+  localStorage.removeItem('baghIran_bonusTime');
+  state.comboCount = 0;
+  state.sessionScore = 0;
+  state.lastMoveTime = 0;
+  render();
+  startTimer();
+}
+
+// ============================================================
+// ناوبری
+// ============================================================
+function goToNextStage() {
+  const cfg = LEVELS[state.levelIdx];
+  if (state.stage < cfg.stages) {
+    loadStage(state.levelIdx, state.stage + 1);
+  } else {
+    closeAllModals();
+    sfxLevelUp();
+    throwConfetti(60);
+    setTimeout(() => showLevelDone(), 300);
+  }
+}
+
+function showLevelDone() {
+  const cfg = LEVELS[state.levelIdx];
+  const hasNext = state.levelIdx + 1 < LEVELS.length;
+  let totalTime = 0, totalStars = 0;
+  for (let s = 1; s <= cfg.stages; s++) {
+    const t = parseInt(localStorage.getItem(`baghIran_time_L${state.levelIdx}_S${s}`) || '0', 10);
+    totalTime += t;
+    totalStars += t ? calcStars(t, state.levelIdx, s) : 1;
+  }
+  const avgTime = Math.round(totalTime / cfg.stages);
+  const maxStars = cfg.stages * 3;
+  const filledStars = Math.round((totalStars / maxStars) * 5);
+
+  $('levelDoneTitle').textContent = `🏆 باغ ${state.levelIdx + 1} کامل شد!`;
+  $('levelDoneText').innerHTML = `باغ <b>${LEVEL_NAMES[state.levelIdx]}</b> با موفقیت شکوفا شد ${playerName} جان`;
+  $('levelTotalTime').textContent = fmtTime(totalTime);
+  $('levelAvgTime').textContent = `میانگین: ${fmtTime(avgTime)}`;
+  $('levelStars').innerHTML = Array.from({length: 5}, (_, i) =>
+    `<span class="${i < filledStars ? 'on' : ''}">★</span>`
+  ).join('');
+  $('levelStarsText').textContent = `${totalStars} از ${maxStars} ستاره`;
+
+  if (totalStars >= maxStars) unlockAchievement('perfect_bagh');
+  if (totalStars >= maxStars * LEVELS.length) unlockAchievement('all_stars');
+
+  const nextBtn = $('nextLevel');
+  if (hasNext) {
+    nextBtn.style.display = 'inline-block';
+    nextBtn.textContent = `ورود به باغ ${state.levelIdx + 2} ←`;
+  } else {
+    nextBtn.style.display = 'none';
+  }
+  openModal('levelDoneModal');
+}
+
+function goToNextLevel() {
+  if (state.levelIdx + 1 < LEVELS.length) {
+    loadStage(state.levelIdx + 1, 1);
+  } else {
+    closeAllModals();
+    sfxLevelUp();
+    throwConfetti(80);
+    setTimeout(() => showGameDone(), 300);
+  }
+}
+
+function showGameDone() {
+  let gameTotal = 0;
+  for (let l = 0; l < LEVELS.length; l++) {
+    for (let s = 1; s <= LEVELS[l].stages; s++) {
+      gameTotal += parseInt(localStorage.getItem(`baghIran_time_L${l}_S${s}`) || '0', 10);
+    }
+  }
+  $('gameTotalTime').textContent = fmtTime(gameTotal);
+  $('gameDoneText').textContent = `${playerName} جان، هر ۶ باغ رو شکوفا کردی!`;
+  $('gameStars').innerHTML = Array.from({length: 5}, () => `<span class="on">★</span>`).join('');
+  openModal('gameDoneModal');
+}
+
+// ============================================================
+// منو
+// ============================================================
+function openMenu() {
+  const container = $('levelSelect');
+  container.innerHTML = '';
+  LEVELS.forEach((lv, i) => {
+    const unlocked = i === 0 || isLevelUnlocked(i);
+    let doneCount = 0;
+    for (let s = 1; s <= lv.stages; s++) {
+      if (localStorage.getItem(`baghIran_done_L${i}_S${s}`)) doneCount++;
+    }
+    const progressPct = (doneCount / lv.stages) * 100;
+
+    const card = document.createElement('div');
+    card.className = 'level-card' + (unlocked ? '' : ' locked');
+    card.innerHTML = `
+      <span class="tree-icon">${LEVEL_ICONS[i]}</span>
+      <h3>باغ ${i + 1} — ${LEVEL_NAMES[i]}</h3>
+      <p>${lv.colors} نوع · ${lv.stages} مرحله · ${doneCount}/${lv.stages}</p>
+      <div class="progress-mini"><div style="width:${progressPct}%"></div></div>
+    `;
+    if (unlocked) {
+      card.addEventListener('click', () => {
+        let startStage = 1;
+        for (let s = 1; s <= lv.stages; s++) {
+          if (!localStorage.getItem(`baghIran_done_L${i}_S${s}`)) { startStage = s; break; }
+          startStage = s;
+        }
+        loadStage(i, startStage);
+      });
+    }
+    container.appendChild(card);
+  });
+  openModal('menuModal');
+}
+function isLevelUnlocked(idx) {
+  if (idx === 0) return true;
+  const prev = LEVELS[idx - 1];
+  for (let s = 1; s <= prev.stages; s++) {
+    if (!localStorage.getItem(`baghIran_done_L${idx - 1}_S${s}`)) return false;
+  }
+  return true;
+}
+
+function openMap() {
+  const nodesBox = $('mapNodes');
+  nodesBox.innerHTML = '';
+  LEVELS.forEach((lv, i) => {
+    let doneCount = 0;
+    for (let s = 1; s <= lv.stages; s++) {
+      if (localStorage.getItem(`baghIran_done_L${i}_S${s}`)) doneCount++;
+    }
+    const cls = doneCount === lv.stages ? 'done' : (doneCount > 0 ? 'current' : '');
+    const node = document.createElement('div');
+    node.className = `map-node ${cls}`;
+    node.textContent = LEVEL_ICONS[i];
+    nodesBox.appendChild(node);
+  });
+  openModal('mapModal');
+}
+
+function openAchievements() {
+  const grid = $('achievementsGrid');
+  grid.innerHTML = '';
+  const unlocked = getAchievements();
+  ACHIEVEMENTS.forEach(a => {
+    const el = document.createElement('div');
+    el.className = 'achievement' + (unlocked[a.id] ? ' unlocked' : '');
+    el.innerHTML = `
+      <span class="ach-icon">${a.icon}</span>
+      <div class="ach-name">${a.name}</div>
+      <div class="ach-desc">${a.desc}</div>
+    `;
+    grid.appendChild(el);
+  });
+  openModal('achievementsModal');
+}
+
+// ============================================================
+// پنل کاربری
+// ============================================================
+function openProfile() {
+  const score = getTotalScore();
+  const t = getTitleByScore(score);
+  const r = getRankByScore(score);
+
+  $('profileAvatar').textContent = t.avatar;
+  $('profileName').textContent = playerName;
+  $('profileTitle').textContent = t.title;
+  $('profileRank').textContent = `رتبه: ${r.name}`;
+  $('profileNameInput').value = playerName;
+
+  // XP: از score استفاده می‌کنیم — هر سطح 500 XP
+  const xpPerLevel = 500;
+  const currentXp = score % xpPerLevel;
+  const xpPct = (currentXp / xpPerLevel) * 100;
+  $('xpFill').style.width = xpPct + '%';
+  $('xpText').textContent = `${currentXp} / ${xpPerLevel} XP (سطح ${Math.floor(score/xpPerLevel)+1})`;
+
+  // آمار
+  let totalDone = 0, totalStars = 0, totalStages = 0, totalTime = 0;
+  for (let l = 0; l < LEVELS.length; l++) {
+    for (let s = 1; s <= LEVELS[l].stages; s++) {
+      totalStages++;
+      if (localStorage.getItem(`baghIran_done_L${l}_S${s}`)) {
+        totalDone++;
+        const tm = parseInt(localStorage.getItem(`baghIran_time_L${l}_S${s}`) || '0', 10);
+        totalTime += tm;
+        totalStars += tm ? calcStars(tm, l, s) : 1;
+      }
+    }
+  }
+  $('psbStages').textContent = `${totalDone}/${totalStages}`;
+  $('psbStars').textContent = totalStars;
+  $('psbScore').textContent = score;
+  $('psbTime').textContent = fmtTime(totalTime);
+  $('psbAch').textContent = Object.keys(getAchievements()).length;
+  $('psbStreak').textContent = localStorage.getItem('baghIran_streak') || '0';
+
+  // پیشرفت باغ‌ها
+  const list = $('gardenProgressList');
+  list.innerHTML = '';
+  LEVELS.forEach((lv, i) => {
+    let done = 0;
+    for (let s = 1; s <= lv.stages; s++) {
+      if (localStorage.getItem(`baghIran_done_L${i}_S${s}`)) done++;
+    }
+    const pct = Math.round((done / lv.stages) * 100);
+    const row = document.createElement('div');
+    row.className = 'progress-garden-row';
+    row.innerHTML = `
+      <span class="pgr-icon">${LEVEL_ICONS[i]}</span>
+      <span class="pgr-name">باغ ${LEVEL_NAMES[i]}</span>
+      <div class="pgr-bar"><div style="width:${pct}%"></div></div>
+      <span class="pgr-pct">${pct}%</span>
+    `;
+    list.appendChild(row);
+  });
+
+  openModal('profileModal');
+}
+
+// ============================================================
+// جایزه روزانه + استریک
+// ============================================================
+function checkDailyGift() {
+  const today = new Date().toDateString();
+  const lastClaim = localStorage.getItem('baghIran_lastGift');
+  const gift = $('dailyGift');
+  if (lastClaim === today) gift.style.display = 'none';
+  else gift.style.display = 'block';
+}
+
+function updateStreak() {
+  const today = new Date().toDateString();
+  const last = localStorage.getItem('baghIran_lastVisit');
+  const yesterday = new Date(Date.now() - 86400000).toDateString();
+  let streak = parseInt(localStorage.getItem('baghIran_streak') || '0', 10);
+  if (last === today) {
+    // امروز قبلاً اومده
+  } else if (last === yesterday) {
+    streak++;
+  } else {
+    streak = 1;
+  }
+  localStorage.setItem('baghIran_lastVisit', today);
+  localStorage.setItem('baghIran_streak', String(streak));
+}
+
+function openDailyGift() {
+  const today = new Date().toDateString();
+  const lastClaim = localStorage.getItem('baghIran_lastGift');
+  if (lastClaim === today) {
+    showToast('جایزه امروز رو قبلاً گرفتی!', 'anar');
+    return;
+  }
+  const streak = parseInt(localStorage.getItem('baghIran_streak') || '1', 10);
+  const rewards = [
+    { icon: '💡', text: '+۳ راهنما برای بازی بعدی', type: 'hint' },
+    { icon: '⏱️', text: '+۲ زمان اضافه', type: 'time' },
+    { icon: '💎', text: '+۲۰۰ امتیاز', type: 'score' },
+    { icon: '🎁', text: '+۵۰۰ امتیاز!', type: 'score500' },
+  ];
+  if (streak >= 3) rewards.push({ icon: '👑', text: '+۱۰۰۰ امتیاز ویژه استریک!', type: 'score1000' });
+  const r = rewards[Math.floor(Math.random() * rewards.length)];
+  $('giftIcon').textContent = r.icon;
+  $('giftReward').textContent = r.text;
+  $('giftMsg').textContent = streak > 1 ? `🔥 ${streak} روز متوالی! جایزه امروز آماده‌ست` : 'جایزه امروز آماده‌ست!';
+  $('claimGift').onclick = () => {
+    localStorage.setItem('baghIran_lastGift', today);
+    if (r.type === 'score') addScore(200);
+    if (r.type === 'score500') addScore(500);
+    if (r.type === 'score1000') addScore(1000);
+    if (r.type === 'hint') {
+      const h = parseInt(localStorage.getItem('baghIran_bonusHints') || '0', 10) + 3;
+      localStorage.setItem('baghIran_bonusHints', String(h));
+    }
+    if (r.type === 'time') {
+      const t = parseInt(localStorage.getItem('baghIran_bonusTime') || '0', 10) + 2;
+      localStorage.setItem('baghIran_bonusTime', String(t));
+    }
+    sfxGift(); vib([30, 50, 30]);
+    throwConfetti(30);
+    closeAllModals();
+    showToast(`🎉 ${r.text}`, 'gold');
+    checkDailyGift();
+    render();
+  };
+  openModal('giftModal');
+}
+
+// ============================================================
+// چالش روزانه
+// ============================================================
+function checkDailyChallenge() {
+  const today = new Date().toDateString();
+  const lastChallenge = localStorage.getItem('baghIran_lastChallenge');
+  const el = $('dailyChallenge');
+  if (lastChallenge === today) el.style.display = 'none';
+  else el.style.display = 'block';
+}
+
+function openDailyChallenge() {
+  const today = new Date().toDateString();
+  const lastChallenge = localStorage.getItem('baghIran_lastChallenge');
+  if (lastChallenge === today) {
+    showToast('چالش امروز رو انجام دادی!', 'anar');
+    return;
+  }
+  // چالش تصادفی — یه مرحله از یه باغ تصادفی
+  const levelIdx = Math.floor(Math.random() * LEVELS.length);
+  const stage = Math.floor(Math.random() * LEVELS[levelIdx].stages) + 1;
+  $('challengeDesc').textContent = `امروز باید مرحله ${stage} از باغ ${LEVEL_NAMES[levelIdx]} رو با امتیاز دوبرابر تموم کنی!`;
+  $('challengeIcon').textContent = LEVEL_ICONS[levelIdx];
+  $('challengeReward').textContent = '×۲ امتیاز';
+  $('challengeSub').textContent = `${LEVEL_NAMES[levelIdx]} — مرحله ${stage}`;
+  $('startChallenge').onclick = () => {
+    localStorage.setItem('baghIran_lastChallenge', today);
+    state.isChallenge = true;
+    state.challengeMultiplier = 2;
+    loadStage(levelIdx, stage);
+    showToast('🎯 چالش شروع شد! امتیاز ×۲', 'gold');
+    checkDailyChallenge();
+  };
+  openModal('challengeModal');
+}
+
+// ============================================================
+// تنظیمات
+// ============================================================
+function openSettings() {
+  $('soundSwitch').classList.toggle('on', settings.sound);
+  $('musicSwitch').classList.toggle('on', settings.music);
+  $('vibrateSwitch').classList.toggle('on', settings.vibrate);
+  $('guideSwitch').classList.toggle('on', settings.guide);
+  $('nightSwitch').classList.toggle('on', settings.lightMode);
+  $('autoSwitch').classList.toggle('on', settings.autoLight);
+  renderStats();
+  openModal('settingsModal');
+}
+function renderStats() {
+  const totalTime = (() => {
+    let t = 0;
+    for (let l = 0; l < LEVELS.length; l++)
+      for (let s = 1; s <= LEVELS[l].stages; s++)
+        t += parseInt(localStorage.getItem(`baghIran_time_L${l}_S${s}`) || '0', 10);
+    return t;
+  })();
+  let totalDone = 0, totalStars = 0, totalStages = 0;
+  for (let l = 0; l < LEVELS.length; l++) {
+    for (let s = 1; s <= LEVELS[l].stages; s++) {
+      totalStages++;
+      if (localStorage.getItem(`baghIran_done_L${l}_S${s}`)) {
+        totalDone++;
+        const t = parseInt(localStorage.getItem(`baghIran_time_L${l}_S${s}`) || '0', 10);
+        totalStars += t ? calcStars(t, l, s) : 1;
+      }
+    }
+  }
+  $('statList').innerHTML = `
+    <div class="stat-item"><span>باغبان</span><b>${playerName}</b></div>
+    <div class="stat-item"><span>مراحل کامل‌شده</span><b>${totalDone} / ${totalStages}</b></div>
+    <div class="stat-item"><span>ستاره‌های کسب‌شده</span><b>${totalStars} / ${totalStages * 3}</b></div>
+    <div class="stat-item"><span>امتیاز کل</span><b>${getTotalScore()}</b></div>
+    <div class="stat-item"><span>زمان کل بازی</span><b>${fmtTime(totalTime)}</b></div>
+    <div class="stat-item"><span>دستاوردها</span><b>${Object.keys(getAchievements()).length} / ${ACHIEVEMENTS.length}</b></div>
+  `;
+}
+
+// ============================================================
+// ورود / نام کاربری
+// ============================================================
+function checkFirstTime() {
+  const savedName = localStorage.getItem('baghIran_name');
+  if (savedName) {
+    playerName = savedName;
+    updateHeaderProfile();
+    return false;
+  }
+  return true;
+}
+
+function showWelcome() {
+  openModal('welcomeModal');
+  setTimeout(() => $('nameInput').focus(), 400);
+}
+
+// ============================================================
+// رویدادها
+// ============================================================
+$('undoBtn').addEventListener('click', () => {
+  if (state.history.length === 0) return;
+  const prev = state.history.pop();
+  state.bottles = prev.bottles;
+  state.moves = prev.moves;
+  state.selected = null;
+  state.won = false;
+  state.usedUndo = true;
+  sfxPick(); vib(15);
+  render();
+});
+$('restartBtn').addEventListener('click', () => loadStage(state.levelIdx, state.stage));
+$('hintBtn').addEventListener('click', showHint);
+$('addTimeBtn').addEventListener('click', useAddTime);
+$('winNext').addEventListener('click', goToNextStage);
+$('winRetry').addEventListener('click', () => loadStage(state.levelIdx, state.stage));
+$('nextLevel').addEventListener('click', goToNextLevel);
+$('backToMenu').addEventListener('click', () => { stopTimer(); openMenu(); });
+$('gameDoneRestart').addEventListener('click', () => {
+  for (let l = 0; l < LEVELS.length; l++) {
+    for (let s = 1; s <= LEVELS[l].stages; s++) {
+      localStorage.removeItem(`baghIran_done_L${l}_S${s}`);
+      localStorage.removeItem(`baghIran_best_L${l}_S${s}`);
+      localStorage.removeItem(`baghIran_time_L${l}_S${s}`);
+    }
+  }
+  loadStage(0, 1);
+});
+$('menuBtn').addEventListener('click', openMenu);
+$('closeMenu').addEventListener('click', closeAllModals);
+$('closeSettings').addEventListener('click', closeAllModals);
+$('closeAchievements').addEventListener('click', closeAllModals);
+$('closeMap').addEventListener('click', closeAllModals);
+$('closeProfile').addEventListener('click', closeAllModals);
+$('closeChallenge').addEventListener('click', closeAllModals);
+$('achBtn').addEventListener('click', openAchievements);
+$('setBtn').addEventListener('click', openSettings);
+$('mapBtn').addEventListener('click', openMap);
+$('profileChip').addEventListener('click', openProfile);
+
+// ✅ تغییر تم
+document.querySelectorAll('.theme-option').forEach(el => {
+  el.addEventListener('click', () => {
+    const newTheme = el.dataset.theme;
+    if (newTheme === settings.theme) return;
+    settings.theme = newTheme;
+    saveSettings();
+    applyTheme();
+    showToast(`تم ${THEMES[newTheme].name} فعال شد`, 'gold');
+    sfxPick();
+    loadStage(state.levelIdx, state.stage);
+  });
+});
+
+$('lightBtn').addEventListener('click', () => {
+  settings.lightMode = !settings.lightMode;
+  settings.autoLight = false;
+  saveSettings();
+  applyLightMode();
+  render();
+  sfxPick();
+});
+$('nightSwitch').addEventListener('click', () => {
+  settings.lightMode = !settings.lightMode;
+  settings.autoLight = false;
+  saveSettings();
+  applyLightMode();
+  render();
+  sfxPick();
+});
+$('autoSwitch').addEventListener('click', () => {
+  settings.autoLight = !settings.autoLight;
+  saveSettings();
+  applyLightMode();
+  render();
+  sfxPick();
+});
+$('soundSwitch').addEventListener('click', () => {
+  settings.sound = !settings.sound;
+  saveSettings();
+  $('soundSwitch').classList.toggle('on', settings.sound);
+  if (settings.sound) sfxPick();
+});
+$('musicSwitch').addEventListener('click', () => {
+  settings.music = !settings.music;
+  saveSettings();
+  $('musicSwitch').classList.toggle('on', settings.music);
+  if (settings.music) { initAudio(); startMusic(); showToast('موسیقی فعال شد 🎵', 'gold'); }
+  else { stopMusic(); showToast('موسیقی خاموش شد', 'gold'); }
+});
+$('vibrateSwitch').addEventListener('click', () => {
+  settings.vibrate = !settings.vibrate;
+  saveSettings();
+  $('vibrateSwitch').classList.toggle('on', settings.vibrate);
+  if (settings.vibrate) vib(30);
+});
+$('guideSwitch').addEventListener('click', () => {
+  settings.guide = !settings.guide;
+  saveSettings();
+  $('guideSwitch').classList.toggle('on', settings.guide);
+  $('guideChar').style.display = settings.guide ? 'block' : 'none';
+});
+$('resetProgressBtn').addEventListener('click', () => {
+  if (!confirm('همه پیشرفت پاک بشه؟')) return;
+  localStorage.clear();
+  location.reload();
+});
+
+// ورود نام
+$('startGameBtn').addEventListener('click', () => {
+  const name = $('nameInput').value.trim();
+  if (!name) {
+    showToast('لطفاً یه اسم وارد کن!', 'anar');
+    $('nameInput').focus();
+    return;
+  }
+  playerName = name;
+  localStorage.setItem('baghIran_name', name);
+  closeAllModals();
+  updateHeaderProfile();
+  sfxGift();
+  throwConfetti(40);
+  showToast(`خوش اومدی ${name} جان! 🌳`, 'gold');
+  setTimeout(() => showGuideBubble(`سلام ${name}! من راهنمای تو هستم 🦜`), 500);
+});
+$('nameInput').addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') $('startGameBtn').click();
+});
+
+// ذخیره نام از پنل
+$('saveNameBtn').addEventListener('click', () => {
+  const n = $('profileNameInput').value.trim();
+  if (!n) { showToast('اسم نمی‌تونه خالی باشه!', 'anar'); return; }
+  playerName = n;
+  localStorage.setItem('baghIran_name', n);
+  updateHeaderProfile();
+  $('profileName').textContent = n;
+  showToast('اسم ذخیره شد ✅', 'gold');
+  sfxPick();
+});
+
+// چالش روزانه
+$('dailyChallenge').addEventListener('click', openDailyChallenge);
+
+$('guideChar').addEventListener('click', cycleGuideMessage);
+$('dailyGift').addEventListener('click', openDailyGift);
+
+// ============================================================
+// شروع
+// ============================================================
+loadSettings();
+initStarsBg();
+initClouds();
+initGarden();
+applyTheme();
+applyLightMode();
+updateStreak();
+checkDailyGift();
+checkDailyChallenge();
+
+const isFirstTime = checkFirstTime();
+if (isFirstTime) {
+  setTimeout(showWelcome, 300);
+} else {
+  updateHeaderProfile();
+  loadStage(0, 1);
+  setTimeout(() => {
+    showGuideBubble(`سلام ${playerName}! من راهنمای تو هستم 🦜`);
+    initAudio();
+  }, 1200);
+}
+
+setInterval(() => {
+  if (state.won) return;
+  if (Math.random() < 0.3) cycleGuideMessage();
+}, 25000);
+
+setInterval(() => {
+  if (settings.autoLight) applyLightMode();
+}, 60000);
+</script>
+<script src="features.js"></script>
+</body>
+</html>
